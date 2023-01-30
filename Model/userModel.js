@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const userSchema = mongoose.schema({
+const usersSchema = mongoose.schema({
     name: {
         type: String,
         required: [true, "Please enter your name"]
@@ -42,6 +42,6 @@ const userSchema = mongoose.schema({
 
 });
 
-const User = mongoose.model("User", userSchema);
+const Users = mongoose.model("Users", usersSchema);
 
-modeule.exports = User;
+export default Users;

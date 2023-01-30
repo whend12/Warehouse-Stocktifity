@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv"
 import mongoose from "mongoose";
+import productRoutes from "./routes/index.js"
+
 
 
 const app = express();
@@ -15,6 +17,9 @@ const connect = async () => {
         throw error;
     }
 }
+
+app.use(express.json());
+app.use("/products", productRoutes);
 
 app.listen(5000, () => {
     connect();

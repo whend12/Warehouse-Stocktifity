@@ -1,89 +1,65 @@
-import Product from '../models/productModel.js'
+import Product from '../model/productModels.js'
 
 
-// @desc    Fetch all products
-// @route   GET /api/products
-// @access  Public
+
 export const getProducts = async (req, res) => {
     try {
-        const products = await Product.findAll(
-            // {
-            //     where: {
-            //         id: req.params.id
-            //     }.sort({ createdAt: -1 })
-        );
-        res.json(products);
+        try {
+            const products = await Product.find();
+            res.json(products);
+    } catch (error) {
+        res.json({ message: error.message });
+    }  
     } catch (error) {
         res.json({ message: error.message });
     }
 };
 
 
-// @desc    Fetch single product
-// @route   GET /api/products/:id
-// @access  Public
-export const getProductById = async (req, res) => {
+//get product by SKU
+export const getProductBySKU = async (req, res) => {
     try {
-        const product = await Product.findAll({
-            where: {
-                id: req.params.id
-            }
-        });
+        const product = await Product.findOne({ sku: req.params.sku });
+        res.json(product);
     } catch (error) {
-        
+        res.json({ message: error.message });
     }
 };
 
 
 //create product
 export const createProduct = async (req, res) => {
-    const { name,sku,quantity,category } = req.body
-
-    if (!name || sku || quantity || category ) {
-        res.status(400);
-        throw new Error('Please fill in all fields')
-    }
-
-    const product = await Product.create({
-        name,
-        sku,
-        quantity,
-        category
+   try {
+    await Product.create(req.body);
+    res.json({
+        "Message": "Product Created"
     })
-    res.status(201).json(product)
-
+    
+   } catch (error) {
+    
+   }
 };
 
-//update product
+
+
+//update product by SKU
 
 export const updateProduct = async (req, res) => {
-    const { name,sku,quantity,category } = req.body
-
-    const product = await Product.findById(req.params.id)
-
-    if (product) {
-        product.name = name
-        product.sku = sku
-        product.quantity = quantity
-        product.category = category
-
-        const updatedProduct = await product.save()
-        res.json(updatedProduct)
-    } else {
-        res.status(404)
-        throw new Error('Product not found')
+    try {
+        await Product.updateOne({ sku: req.params.sku }, req.body);
+        res.json({
+            "message": "Product Updated"
+        });
+    } catch (error) {
+        res.json({ message: error.message });
     }
 };
 
 
-//delete product
+//delete product By SKU
 export const deleteProduct = async (req, res) => {
     try {
-        await Product.destroy({
-            where: {
-                id: req.params.id
-            }
-            });
+        await Product.deleteOne({ sku: req.params.sku });
         res.json({
             "message": "Product Deleted"
         });

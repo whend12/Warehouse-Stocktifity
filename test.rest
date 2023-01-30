@@ -1,0 +1,18 @@
+GET http://localhost:5000/products
+
+
+
+###
+POST  http://localhost:5000/products
+Content-Type: application/json
+
+{
+    "name": "Pensil 2B",
+    "quantity": 100,
+    "sku": "A003",
+    "category": "Alat Tulis"
+}
+
+###
+
+GET http://localhost:5000/products/A003
