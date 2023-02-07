@@ -1,8 +1,8 @@
 import express from "express";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
-import productRoutes from "./routes/index.js"
-
+import router from "./routes/index.js";
 
 
 const app = express();
@@ -18,8 +18,9 @@ const connect = async () => {
     }
 }
 
+app.use(cookieParser());
 app.use(express.json());
-app.use("/products", productRoutes);
+app.use(router);
 
 app.listen(5000, () => {
     connect();
