@@ -14,7 +14,7 @@ const supplierSchema = mongoose.Schema({
         maxLength: [100, "Supplier email cannot exceed 100 characters"]
     },
     phone: {
-        type: String,
+        type: Number,
         required: [true, "Please enter supplier phone"],
         trim: true,
         maxLength: [100, "Supplier phone cannot exceed 100 characters"]
@@ -24,20 +24,15 @@ const supplierSchema = mongoose.Schema({
         required: [true, "Please enter supplier address"],
         trim: true,
         maxLength: [100, "Supplier address cannot exceed 100 characters"]
-    },
-    products: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Product"
-        }
-    ]
-}
-    ,
+    }   
+},
     {
         timestamps: true,
     }
 )
 
+
 const Supplier = mongoose.model("Supplier", supplierSchema);
+
 
 export default Supplier;

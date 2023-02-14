@@ -1,7 +1,6 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import { mongoose } from 'mongoose';
 
-const usersSchema = mongoose.schema({
+const usersSchema = mongoose.Schema({
     name: {
         type: String,
         required: [true, "Please enter your name"]
@@ -17,28 +16,14 @@ const usersSchema = mongoose.schema({
         type: String,
         required: [true, "Please enter your password"],
         minLength: [6, "Minimum password length is 6 characters"],
-        maxLength: [32, "Maximum password length is 32 characters"]
     },
     role: {
         type: String,
-        enum: ["supplier", "admin"],
         default: "admin"
     },
-
-});
-
-//Encrypt password
-    userSchema.pre("save", async (next) => {
-        if (!this.isModified("password")){
-            return next();
-        }
-    
-
-    //hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(this.password, salt);
-    this.password = hashPassword;
-    next();
+    refresh_token: {
+        type: String
+    }
 
 });
 

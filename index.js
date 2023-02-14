@@ -1,7 +1,11 @@
 import express from "express";
 import dotenv from "dotenv"
 import mongoose from "mongoose";
-import productRoutes from "./routes/index.js"
+import productRoutes from "./routes/product.js"
+import supplierRoutes from "./routes/supplier.js"
+import userRoutes from "./routes/user.js"
+import cookieParser from "cookie-parser";
+
 
 
 
@@ -18,8 +22,12 @@ const connect = async () => {
     }
 }
 
+
+app.use((cookieParser));
 app.use(express.json());
-app.use("/products", productRoutes);
+app.use("/api/v1", productRoutes);
+app.use("/api/v1", supplierRoutes);
+app.use("/api/v1", userRoutes);
 
 app.listen(5000, () => {
     connect();

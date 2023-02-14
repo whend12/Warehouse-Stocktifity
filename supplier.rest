@@ -1,0 +1,28 @@
+GET http://localhost:5000/api/v1/suppliers/
+
+###
+POST http://localhost:5000/api/v1/suppliers
+Content-Type: application/json
+
+{
+    "name": "Wendy Listrik",
+    "email": "wend@gmail.com",
+    "phone": "08892123123",
+    "address": "Bantar Listrik Gerbang"
+}
+
+####
+//update supplier
+PUT http://localhost:5000/api/v1/suppliers/1
+Content-Type: application/json
+
+{
+    "name": "Wendy Listrik",
+    "email": "gerd@gmail.com",
+    "phone": "08892123123",
+    "address": "Bantar Listrik Gerbang"
+}
+
+###
+//delete supplier
+DELETE http://localhost:5000/api/v1/suppliers/63da401395fb36029952ec32

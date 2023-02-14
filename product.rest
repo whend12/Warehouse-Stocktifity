@@ -1,0 +1,35 @@
+GET http://localhost:5000/api/v1/products
+
+
+
+###
+POST  http://localhost:5000/api/v1/products
+Content-Type: application/json
+
+{
+    "name": "Pensil 10B",
+    "quantity": 100,
+    "sku": "A003",
+    "category": "Alat Tulis"
+}
+
+###
+GET http://localhost:5000/api/v1/products/A004
+
+
+###
+
+PUT http://localhost:5000/api/v1/products/A003
+Content-Type: application/json
+
+{   "name": "Pensil 3B",
+    "quantity": 50,
+    "sku": "A003",
+    "category": "Alat Tulis"
+}
+
+###
+DELETE http://localhost:5000/api/v1/products/A004
+
+###
+
