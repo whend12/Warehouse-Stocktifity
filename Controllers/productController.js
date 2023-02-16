@@ -11,8 +11,15 @@ export const getProducts = async (req, res) => {
     }
 };
 
-
-
+//Search product by name
+export const searchProduct = async (req, res) => {
+    try {
+        const products = await Product.find({ name: { $regex: req.params.name, $options: "i" } });
+        res.json(products);
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+};
 
 //get product by SKU
 export const getProductBySKU = async (req, res) => {

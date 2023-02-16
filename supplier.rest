@@ -1,14 +1,15 @@
-GET http://localhost:5000/api/v1/suppliers/
+GET http://localhost:5000/api/v1/suppliers/63da401395fb36029952ec32
+
 
 ###
 POST http://localhost:5000/api/v1/suppliers
 Content-Type: application/json
 
 {
-    "name": "Wendy Listrik",
-    "email": "wend@gmail.com",
-    "phone": "08892123123",
-    "address": "Bantar Listrik Gerbang"
+    "name": "Wendy plastik",
+    "email": "wend2@gmail.com",
+    "phone": "088921223123",
+    "address": "Bantar Listrik Gerbang 2"
 }
 
 ####

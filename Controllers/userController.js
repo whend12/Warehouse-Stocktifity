@@ -23,9 +23,9 @@ export const Register = async(req, res) => {
             email: email,
             password: hashPassword
         });
-        res.json({message: "Register Berhasil" });
+        res.json({ msg: "Create Account Succefully!" });
     } catch (error) {
-        console.log(error);
+        console.log(error, { msg: "Failed Create Account" });
     }
 };
 

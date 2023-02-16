@@ -1,0 +1,15 @@
+POST  http://localhost:5000/api/v1/login
+Content-Type: application/json
+
+{ 
+    "email" : "admin@localhost.com",
+    "password": "admin"
+}
+###
+
+
+
+###
+
+GET http://localhost:5000/api/v1/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2VkYzVkZWZiMTRlYjUxNmRkYTgyMDAiLCJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQGxvY2FsaG9zdC5jb20iLCJpYXQiOjE2NzY1Mjk4MDksImV4cCI6MTY3NjYxNjIwOX0.UqDDSYjIM7sBkcKxVNDxGGxEcXP3kif8VzOPLvHFiM8

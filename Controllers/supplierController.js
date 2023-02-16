@@ -13,6 +13,15 @@ export const getAllSuppliers = async (req, res) => {
     }
 };
 
+//Search supplier by name
+export const searchSupplier = async (req, res) => {
+    try {
+        const suppliers = await Supplier.find({ name: { $regex: req.params.name, $options: "i" } });
+        res.status(200).json(suppliers);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+};
 
 //Get supplier by id
 export const getSupplierById = async (req, res) => {
@@ -53,10 +62,15 @@ export const createSupplier = async (req, res) => {
 //Update supplier with validate
 export const updateSupplier = async (req, res) => {
     try {
-        await Supplier.updateOne(req.params.id)
-        res.json({
-            "message": "Supplier Updated"
-        });
+        const existingSku = await Product.findOne({ sku: req.params.sku });
+        if (existingSku) {
+            res.json({ message: "Supplier already exists" });
+        } else {
+            await Product.updateOne({ sku: req.params.sku }, req.body);
+            res.json({
+                "message": "Supplier Updated"
+            });
+        }
     } catch (error) {
         res.json({ message: error.message });
     }
