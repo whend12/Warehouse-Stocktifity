@@ -1,0 +1,32 @@
+.container-fluid {
+    background-color: #B2B2B2;
+    /* filter: blur(2px);
+    -webkit-filter: blur(2px);
+     #301E67 */
+}
+
+label {
+    color: #B2B2B2;
+}
+
+input {
+    width: 380px;
+    margin: 1rem 0;
+    color: black;
+    box-shadow: 1px 1px 1px;
+    outline: 1px solid;
+}
+
+input:hover {
+    outline: 1px solid #00ABB3;
+}
+
+button {
+    width: 380px;
+    box-shadow: 2px 2px 2px;
+}
+
+button:focus {
+    outline: 1px dotted;
+    outline: 5px auto -webkit-focus-ring-color;
+  }

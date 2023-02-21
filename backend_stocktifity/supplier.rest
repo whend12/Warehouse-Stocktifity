@@ -1,13 +1,15 @@
 GET http://localhost:5000/api/v1/suppliers/63da401395fb36029952ec32
 
 
+
+
 ###
 POST http://localhost:5000/api/v1/suppliers
 Content-Type: application/json
 
 {
     "name": "Wendy plastik",
-    "email": "wend2@gmail.com",
+    "email": "wend@gmail.com",
     "phone": "088921223123",
     "address": "Bantar Listrik Gerbang 2"
 }
@@ -26,4 +28,4 @@ Content-Type: application/json
 
 ###
 //delete supplier
-DELETE http://localhost:5000/api/v1/suppliers/63da401395fb36029952ec32
+DELETE http://localhost:5000/api/v1/suppliers/63ef55e6ce58e2068b11df3a

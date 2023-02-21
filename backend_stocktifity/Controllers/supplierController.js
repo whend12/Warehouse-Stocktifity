@@ -50,11 +50,12 @@ export const createSupplier = async (req, res) => {
                 return res.status(400).json({ error: "Supplier with the same Number Phone already exist "});
         }
 
-        const newSupplier = new Supplier.create(req.body)
-        return res.status(200).json({ message:"Supplier Created", data: newSupplier })
+        const supplier = await Supplier.create(req.body);
+        res.status(201).json({message: " supplier created successfully", supplier});
+
 
     } catch (error) {
-        req.json({ message: error.message })
+        res.json({ message: error.message })
     }
 
 }
@@ -62,15 +63,25 @@ export const createSupplier = async (req, res) => {
 //Update supplier with validate
 export const updateSupplier = async (req, res) => {
     try {
-        const existingSku = await Product.findOne({ sku: req.params.sku });
-        if (existingSku) {
-            res.json({ message: "Supplier already exists" });
-        } else {
-            await Product.updateOne({ sku: req.params.sku }, req.body);
-            res.json({
-                "message": "Supplier Updated"
-            });
+        const existingSupplierName = await Supplier.findOne({ name: req.body.name })
+        const existingSupplierEmail = await Supplier.findOne({ email: req.body.email })
+        const existingSupplierPhone = await Supplier.findOne({ phone: req.body.phone })
+        
+        if (existingSupplierName) {
+            return res.status(400).json({message: "Supplier with the same name already exist "});
+        } else if (existingSupplierEmail) {
+            return res.status(400).json({message: "Supplier with the same Email already exist "});
+        } else if (existingSupplierPhone) {
+            return res.status(400).json({message: "Supplier with the same Number Phone already exist "});
         }
+
+        const id = req.params.id;
+        const updateData = req.body;
+        const options = { new: true };
+
+        const result = await Supplier.findByIdAndUpdate(id, updateData, options);
+        console.log(result).json({message: "Supplier updated successfully"})
+
     } catch (error) {
         res.json({ message: error.message });
     }
@@ -79,7 +90,7 @@ export const updateSupplier = async (req, res) => {
 //Delete supplier
 export const deleteSupplier = async (req, res) => {
     try {
-        await Supplier.deleteOne(req.params.id)
+        await Supplier.deleteOne(req.params.name)
         res.json({
             "message": "Supplier Deleted"
         });
