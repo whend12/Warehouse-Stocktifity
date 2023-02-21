@@ -46,14 +46,24 @@ export const SupplierProvider = props => {
         address 
       } = input
 
-      // Created Data
-      axios.post("http://localhost:5000/api/v1/suppliers", {name, email, phone, address})
-      .then((res) => {
-        setFetchStatus(true) 
-        alert(res.data.message)
-      }).catch((res) => {
-        alert(res.data.error)
-      })
+      if (currentId === -1) {
+        // Created Data
+        axios.post("http://localhost:5000/api/v1/suppliers", {name, email, phone, address})
+        .then((res) => {
+          setFetchStatus(true) 
+          alert(res.data.message)
+        }).catch((res) => {
+          alert(res.data.error)
+        })
+      } else {
+        // Update Data
+        axios.put(`http://localhost:5000/api/v1/suppliers${currentId}`, {name, email, phone, address})
+        .then((res)=>{
+          setFetchStatus(true)
+        })
+      }
+
+      setCurrentId(-1)
 
       setInput(
         {
@@ -67,14 +77,14 @@ export const SupplierProvider = props => {
 
     // Handling Edit
     const handleEdit = (event) => {
-      let _idData = event.target.value
-      setShowModal(true)
-      setCurrentId(_idData)
-      axios.get(`http://localhost:5000/api/v1/suppliers/${_idData}`)
+      let idData = event.target.value
+
+      setCurrentId(idData)
+      axios.get(`http://localhost:5000/api/v1/suppliers/${idData}`)
       .then((res) => {
         console.log(res)
-
-        let data = res.data._id
+        setShowModal(true)
+        let data = res.data
 
         setInput(
             {
@@ -84,26 +94,18 @@ export const SupplierProvider = props => {
                 address : res.data.address
             }
         )
-        console.log(setInput)
       })
     }
 
     // const handleEdit = async (event) => {
-    //   try {
-    //     let _idData = event.target.value
-    //     setCurrentId(_idData)            
-    //     const resp = await axios.get(`http://localhost:5000/api/v1/suppliers/${_idData}`)
-        
-    //     if (resp.data === null) {
-    //       // Handle case where data is null
-    //       console.log("Data not found")
-    //       return;
+    //     try {
+    //         let idData = event.target.id
+    //         setCurrentId(idData)            
+    //         const resp = await axios.get(`http://localhost:5000/api/v1/suppliers/${idData}`)
+    //         console.log(resp.data)
+    //     } catch (error) {
+    //         console.log(error)
     //     }
-        
-    //     console.log(resp.data)
-    //   } catch (error) {
-    //     console.log(error)
-    //   }
     // }
 
     // Handling Delete
