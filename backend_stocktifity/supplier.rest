@@ -1,4 +1,4 @@
-GET http://localhost:5000/api/v1/suppliers/63da401395fb36029952ec32
+GET http://localhost:5000/api/v1/suppliers/
 
 
 
@@ -28,4 +28,4 @@ Content-Type: application/json
 
 ###
 //delete supplier
-DELETE http://localhost:5000/api/v1/suppliers/63ef55e6ce58e2068b11df3a
+DELETE http://localhost:5000/api/v1/suppliers/63f5c86b812033745f1b6c58

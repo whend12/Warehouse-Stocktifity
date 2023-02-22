@@ -11,6 +11,19 @@ export const getProducts = async (req, res) => {
     }
 };
 
+//getProductById
+export const getProductById = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if(product === null){
+            return res.status(401).json({message: "Product not found"})
+        }
+        res.json(product);
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
+
 //Search product by name
 export const searchProduct = async (req, res) => {
     try {
@@ -22,29 +35,30 @@ export const searchProduct = async (req, res) => {
 };
 
 //get product by SKU
-export const getProductBySKU = async (req, res) => {
-    try {
-        const product = await Product.findOne({ sku: req.params.sku });
-        res.json(product);
-    } catch (error) {
-        res.json({ message: error.message });
-    }
-};
+// export const getProductBySKU = async (req, res) => {
+//     try {
+//         const product = await Product.findOne({ sku: req.params.sku });
+//         res.json(product);
+//     } catch (error) {
+//         res.json({ message: error.message });
+//     }
+// };
 
 
 //create product and validate if SKU already exists
 export const createProduct = async (req, res) => {
     try {
-        const existingProduct = await Product.findOne({ sku: req.body.sku });
-        if (existingProduct) {
-            res.json({ message: "Product already exists" });
-        } else {
-            await Product.create(req.body);
-            res.json({
-                "message": "Product Created"
-            });
+        const existingProductSku = await Product.findOne({sku: req.body.sku});
+        const existingProductName = await Product.findOne({name: req.body.name});
+
+        if (existingProductName) {
+            return res.status(400).json({error: "Name already exists"});
+        } else if (existingProductSku) {
+            return res.status(400).json({error: "SKU already exists"});
         }
-        
+
+        const product = await Product.create(req.body);
+        res.json({message: "Product created successfully", product});
     } catch (error) {
         res.json({ message: error.message });
     }
@@ -53,31 +67,39 @@ export const createProduct = async (req, res) => {
 
 
 
-//update product by SKU and validate if SKU already exists
+//update product by ID and validate if SKU and Name already exists
 
 export const updateProduct = async (req, res) => {
     try {
-        const existingSku = await Product.findOne({ sku: req.params.sku });
+        const existingSku = await Product.findOne({ sku: req.body.sku })            
+        const existingName = await Product.findOne({ name: req.body.name })            
+        
         if (existingSku) {
-            res.json({ message: "Product already exists" });
-        } else {
-            await Product.updateOne({ sku: req.params.sku }, req.body);
-            res.json({
-                "message": "Product Updated"
-            });
-        }
+            return res.status(400).json({message: "Product with the same SKU already Exist"})
+        } else if (existingName) {
+            return res.status(400).json({message: "Product with the same Name already Exist"})
+        } 
+
+            const id = req.params.id;
+            const updateProduct= req.body;
+            const options= { new: true };
+
+            const result= await Product.findByIdAndUpdate(id,updateProduct,options)
+            return res.status(result).json({message: "Product updated succefully"})
+        
     } catch (error) {
         res.json({ message: error.message });
     }
 };
 
 
-//delete product By SKU
+//delete product By ID
 export const deleteProduct = async (req, res) => {
     try {
-        await Product.deleteMany({ sku: req.params.sku });
-        res.json({
-            "message": "Product Deleted"
+        const id = req.params.id
+        const data = await Product.findByIdAndDelete(id)
+        res.status(201).json({
+            message: "Product Deleted"
         });
     } catch (error) {
         res.json({ message: error.message });

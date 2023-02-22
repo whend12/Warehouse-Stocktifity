@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+
 const supplierSchema = mongoose.Schema({
     name: {
         type: String,

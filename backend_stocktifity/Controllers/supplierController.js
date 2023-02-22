@@ -1,4 +1,3 @@
-import { Model } from 'mongoose';
 import Supplier from '../model/supplierModels.js';
 
 
@@ -27,6 +26,9 @@ export const searchSupplier = async (req, res) => {
 export const getSupplierById = async (req, res) => {
     try {
         const supplier = await Supplier.findById(req.params.id);
+        if(supplier === null) {
+            return res.status(401).json({message: "Supplier not found"})
+        }
         res.status(200).json(supplier);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -52,15 +54,13 @@ export const createSupplier = async (req, res) => {
 
         const supplier = await Supplier.create(req.body);
         res.status(201).json({message: " supplier created successfully", supplier});
-
-
     } catch (error) {
         res.json({ message: error.message })
     }
 
 }
 
-//Update supplier with validate
+//Update supplier by Id with validate
 export const updateSupplier = async (req, res) => {
     try {
         const existingSupplierName = await Supplier.findOne({ name: req.body.name })
@@ -80,7 +80,7 @@ export const updateSupplier = async (req, res) => {
         const options = { new: true };
 
         const result = await Supplier.findByIdAndUpdate(id, updateData, options);
-        console.log(result).json({message: "Supplier updated successfully"})
+        res.status(result).json({message: "Supplier updated successfully"})
 
     } catch (error) {
         res.json({ message: error.message });
@@ -90,12 +90,11 @@ export const updateSupplier = async (req, res) => {
 //Delete supplier
 export const deleteSupplier = async (req, res) => {
     try {
-        await Supplier.deleteOne(req.params.name)
-        res.json({
-            "message": "Supplier Deleted"
-        });
+        const id = req.params.id;
+        const data = await Supplier.findByIdAndDelete(id);
+        res.status(201).json({message: " supplier Delete successfully", data});
     } catch (error) {
-        res.json({ message: error.message });
+        res.status(400).json({ message: error.message });
     }
 }
 

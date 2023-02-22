@@ -7,14 +7,14 @@ POST  http://localhost:5000/api/v1/products
 Content-Type: application/json
 
 {
-    "name": "Pensil 10B",
+    "name": "Pensil 14B",
     "quantity": 100,
-    "sku": "A004",
+    "sku": "A003",
     "category": "Alat Tulis"
 }
 
 ###
-GET http://localhost:5000/api/v1/products/
+GET http://localhost:5000/api/v1/products/63f3ce1e1ba476d6536a75f0
 
 
 ###
@@ -22,14 +22,14 @@ GET http://localhost:5000/api/v1/products/
 PUT http://localhost:5000/api/v1/products/A003
 Content-Type: application/json
 
-{   "name": "Pensil 3A",
+{   "name": "Pensil 14B",
     "quantity": 50,
     "sku": "A007",
     "category": "Alat Tulis"
 }
 
 ###
-DELETE http://localhost:5000/api/v1/products/63f043a852d505eda083876c
+DELETE http://localhost:5000/api/v1/products/63f5c6da4b7c532e29edeba6
 
 ###
 GET http://localhost:5000/api/v1/products/search/pen

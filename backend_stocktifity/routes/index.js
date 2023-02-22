@@ -2,7 +2,7 @@ import express from 'express'
 
 import {
     getProducts,
-    getProductBySKU,
+    getProductById,
     createProduct,
     updateProduct,
     deleteProduct,
@@ -30,7 +30,7 @@ import { refreshToken } from '../middleware/refreshToken.js'
 const router = express.Router()
 
 router.route('/products').get(getProducts).post(createProduct)
-router.route('/products/:sku').get(getProductBySKU).put(updateProduct).delete(deleteProduct)
+router.route('/products/:id').get(getProductById).put(updateProduct).delete(deleteProduct)
 router.route('/products/search/:name').get(searchProduct)
 
 router.route('/suppliers').get(getAllSuppliers).post(createSupplier)

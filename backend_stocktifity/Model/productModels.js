@@ -6,6 +6,7 @@ const productSchema = mongoose.Schema(
     name: {
         type: String,
         required: [true, "Please enter product name"],
+        unique: [true, "Product name already exists"],
         trim: true,
         maxLength: [100, "Product name cannot exceed 100 characters"]
     },
@@ -18,6 +19,7 @@ const productSchema = mongoose.Schema(
     sku: {
         type: String,
         required: [true, "Please enter product sku"],
+        unique: [true, "Product sku already exists"],
         maxLength: [5, "Product sku cannot exceed 5 characters"],
         default: 0
     },
