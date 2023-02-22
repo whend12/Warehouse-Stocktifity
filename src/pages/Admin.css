@@ -1,0 +1,29 @@
+body {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.side-left {
+    background-image: url(https://www.soltius.co.id/site/uploads/images/60c72d743704d-warehouse-management-system.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.side-left-content {
+    backdrop-filter: blur(8px);
+}
+
+/* .side-right {
+    background: rgb(20,66,114);
+    background: linear-gradient(90deg, rgba(20,66,114,1) 0%, rgba(44,116,179,1) 100%);
+} */
+
+@media screen and (max-width: 650px) {
+    .side-left {
+        display: none;
+    }
+
+    .side-right {
+        width: 100%;
+    }
+}
