@@ -21,9 +21,9 @@
     "react-icons": "^4.7.1",
     "react-phone-number-input": "^3.2.18",
     "react-scripts": "5.0.1",
-    "react-sweetalert2": "^0.5.2",
     "styled-components": "^5.3.6",
     "sweetalert": "^2.1.2",
+    "sweetalert2": "^11.7.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
