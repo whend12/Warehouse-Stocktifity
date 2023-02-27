@@ -15,9 +15,6 @@ const Dashboard = () => {
                 <div className="flex w-full">
                 <h1 className="text-white font-semibold text-sm uppercase">Dashboard</h1>
                 </div>
-                <div className="flex justify-end items-center">
-                    <BsFillPersonFill fill="white" size={20}/><h2 className="ml-1 text-white font-semibold text-sm">Admin</h2>
-                </div>
             </header>
                 
         <div className="grid min-h-[634px]">
