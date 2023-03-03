@@ -8,10 +8,10 @@ export const InventoryProvider = props => {
     const [showModal, setShowModal] = useState(false)
     const [open, setOpen] = useState(false)
     const [page, setPage] = useState(1) // Table Pagination
-    const [data, setData] = useState(null) // fetching data
+    const [data, setData] = useState([]) // fetching data
     const [fetchStatus, setFetchStatus] = useState(true) // indikator
     const [search, setSearch] = useState("") // Search
-    const [currentSku, setCurrentSku] = useState(-1)
+    const [currentId, setCurrentId] = useState(-1)
 
     const handleClickOpen = () => {
       setOpen(true)
@@ -70,7 +70,7 @@ export const InventoryProvider = props => {
         category 
       } = input
 
-      if (currentSku === -1) {
+      if (currentId === -1) {
         // Created Data
         axios.post("http://localhost:5000/api/v1/products", {name, quantity, sku, category})
         .then((result) => {
@@ -78,11 +78,12 @@ export const InventoryProvider = props => {
             setFetchStatus(true)
             swal(result.data.message)
         }).catch((error)=>{
-          console.log(error)
+          alert(error.message)
+          console.log(error.message)
         })
       } else {
         // Update Data
-        axios.put(`http://localhost:5000/api/v1/products/${currentSku}`,{name , quantity, sku, category})
+        axios.put(`http://localhost:5000/api/v1/products/${currentId}`,{name , quantity, sku, category})
         .then((result)=>{
           // window.location.reload()
           setFetchStatus(true)
@@ -92,7 +93,7 @@ export const InventoryProvider = props => {
         })
       }
 
-      setCurrentSku(-1)
+      setCurrentId(-1)
 
       setInput(
         {
@@ -106,14 +107,16 @@ export const InventoryProvider = props => {
 
     // Handling Edit
     const handleEdit = (event) => {
-      let idData = event.target.value
-      setShowModal(true)
-      setCurrentSku(idData)
-      axios.get(`http://localhost:5000/api/v1/products/${idData}`)
+      let _idData = event.target.value
+      
+      setCurrentId(_idData)
+      axios.get(`http://localhost:5000/api/v1/products/${_idData}`)
       .then((result) => {
         
-        console.log(result)
-        let data = result.data
+        setShowModal(true)
+        console.log(_idData)
+
+        setCurrentId(result.data._id)
         setInput(
           {
             name : result.data.name,
@@ -126,9 +129,10 @@ export const InventoryProvider = props => {
     }
 
     // Handling Delete
-    const handleDelete = (event) => {
-        let skuData = String(event.target.value)
-        axios.delete(`http://localhost:5000/api/v1/products/${skuData}`)
+    const handleDelete = async (event) => {
+      try {
+        let _idData = event.target.value
+        await axios.delete(`http://localhost:5000/api/v1/products/${_idData}`)
         swal({
           title: 'Are you sure?',
           text: "You want to delete this item? this process cannot be undone",
@@ -145,7 +149,11 @@ export const InventoryProvider = props => {
         } else {
 
         }
+        
       })
+    } catch {
+      
+    }
     }
 
     // const handleDelete = async (event) => {

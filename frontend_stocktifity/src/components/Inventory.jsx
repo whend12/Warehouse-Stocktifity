@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext} from "react"
 import axios from "axios"
+import moment from 'moment'
 
 // Import File
 import "./Inventory.css"
@@ -125,30 +126,30 @@ const Inventory = () => {
                                   <tbody>
                                   {data !== null && data.filter((e) => {
                                     return search.toLowerCase() === "" ? e : e.sku.toLowerCase().includes(search)
-                                  }).map((res) => {
+                                  }).map((item) => {
                                     return (
                                     <>
                                     <tr className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100">
-                                      <td className="border border-slate-300 px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {res.sku}
+                                      <td key={item.sku} className="border border-slate-300 px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {item.sku}
                                       </td>
-                                      <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
-                                        {res.name}
+                                      <td key={item.name} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
+                                        {item.name}
                                       </td>
-                                      <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
-                                        {res.quantity}
+                                      <td key={item.quantity} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
+                                        {item.quantity}
                                       </td>
-                                      <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
-                                        {res.category}
+                                      <td key={item.category} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
+                                        {item.category}
                                       </td>
-                                      <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
-                                        {res.createdAt}
+                                      <td key={item.createdAt} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
+                                        {moment(item.createdAt).format('DD MMMM YYYY, LT')}
                                       </td>
-                                      <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                                        <button onClick={handleEdit} value={res.sku} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
+                                      <td key={item._id} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                        <button onClick={handleEdit} value={item._id} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
                                           <FiEdit size={21} color={"white"} className="mx-auto"/>
                                         </button>
-                                        <button onClick={handleDelete} value={res.sku} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
+                                        <button key={item._id} onClick={handleDelete} value={item._id} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
                                           <TiCancel size={21} color={"white"} className="mx-auto"/>
                                         </button>
                                       </td>
@@ -234,7 +235,7 @@ const Inventory = () => {
                     </div>
                     <div className="w-full sm:flex items-center pt-6 pb-6">
                       <div className="w-full flex justify-center items-center">
-                        <button onClick={() => setShowModal (true)} type={"submit"} className="w-[130px] sm:mr-[-5rem] p-1 bg-[#3282B8] text-white shadow-lg rounded-xl hover:outline-none hover:bg-[#5584AC]">Submit</button>
+                        <button type={"submit"} className="w-[130px] sm:mr-[-5rem] p-1 bg-[#3282B8] text-white shadow-lg rounded-xl hover:outline-none hover:bg-[#5584AC]">Submit</button>
                       </div>           
                     </div>
                   </form>
