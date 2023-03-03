@@ -26,6 +26,9 @@ import {
 
 import { verifyToken } from '../middleware/verifyToken.js'
 import { refreshToken } from '../middleware/refreshToken.js'
+import { validateSupplier } from '../middleware/validateSupplier.js'
+import { validateProduct } from '../middleware/validateProduct.js'
+
 
 const router = express.Router()
 

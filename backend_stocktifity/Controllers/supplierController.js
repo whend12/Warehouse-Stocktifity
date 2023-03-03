@@ -31,7 +31,7 @@ export const getSupplierById = async (req, res) => {
         }
         res.status(200).json(supplier);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        res.status(400).json({ message: error.message });
     }
 }
 
@@ -63,27 +63,10 @@ export const createSupplier = async (req, res) => {
 //Update supplier by Id with validate
 export const updateSupplier = async (req, res) => {
     try {
-        const existingSupplierName = await Supplier.findOne({ name: req.body.name })
-        const existingSupplierEmail = await Supplier.findOne({ email: req.body.email })
-        const existingSupplierPhone = await Supplier.findOne({ phone: req.body.phone })
-        
-        if (existingSupplierName) {
-            return res.status(400).json({message: "Supplier with the same name already exist "});
-        } else if (existingSupplierEmail) {
-            return res.status(400).json({message: "Supplier with the same Email already exist "});
-        } else if (existingSupplierPhone) {
-            return res.status(400).json({message: "Supplier with the same Number Phone already exist "});
-        }
-
-        const id = req.params.id;
-        const updateData = req.body;
-        const options = { new: true };
-
-        const result = await Supplier.findByIdAndUpdate(id, updateData, options);
-        res.status(result).json({message: "Supplier updated successfully"})
-
+        const result = await Supplier.findByIdAndUpdate(req.params.id, {$set: req.body})
+        res.status(201).json({message: " supplier updated successfully"});
     } catch (error) {
-        res.json({ message: error.message });
+        res.status(400).json({ message: error.message });
     }
 }
 
@@ -94,7 +77,7 @@ export const deleteSupplier = async (req, res) => {
         const data = await Supplier.findByIdAndDelete(id);
         res.status(201).json({message: " supplier Delete successfully", data});
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ message: error.message }); 
     }
 }
 

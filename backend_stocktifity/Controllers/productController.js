@@ -58,9 +58,9 @@ export const createProduct = async (req, res) => {
         }
 
         const product = await Product.create(req.body);
-        res.json({message: "Product created successfully", product});
+        res.status(201).json({message: "Product created successfully", product});
     } catch (error) {
-        res.json({ message: error.message });
+        res.status(400).json({ message: error.message });
     }
 }
     
@@ -71,21 +71,10 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
     try {
-        const existingSku = await Product.findOne({ sku: req.body.sku })            
-        const existingName = await Product.findOne({ name: req.body.name })            
-        
-        if (existingSku) {
-            return res.status(400).json({message: "Product with the same SKU already Exist"})
-        } else if (existingName) {
-            return res.status(400).json({message: "Product with the same Name already Exist"})
-        } 
-
-            const id = req.params.id;
-            const updateProduct= req.body;
-            const options= { new: true };
-
-            const result= await Product.findByIdAndUpdate(id,updateProduct,options)
-            return res.status(result).json({message: "Product updated succefully"})
+         await Product.findByIdAndUpdate(req.params.id, {$set: req.body})
+        res.status(200).json({
+            message: "Product Updated", 
+        });
         
     } catch (error) {
         res.json({ message: error.message });
@@ -98,7 +87,7 @@ export const deleteProduct = async (req, res) => {
     try {
         const id = req.params.id
         const data = await Product.findByIdAndDelete(id)
-        res.status(201).json({
+        res.status(200).json({
             message: "Product Deleted"
         });
     } catch (error) {
