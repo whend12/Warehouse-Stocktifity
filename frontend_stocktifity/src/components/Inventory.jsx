@@ -98,8 +98,8 @@ const Inventory = () => {
                             
                             {/* Table Supplier */}
                             
-                            <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-                              <div className="overflow-hidden">
+                            <div className="py-2 sm:px-6 lg:px-8">
+                              <div className="overflow-auto">
                                 <table className="min-w-full table-fixed border-collapse border border-slate-300">
                                   <thead className="bg-white border-b">
                                     <tr>
@@ -143,13 +143,14 @@ const Inventory = () => {
                                         {item.category}
                                       </td>
                                       <td key={item.createdAt} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
-                                        {moment(item.createdAt).format('DD MMMM YYYY, LT')}
+                                        <span className="font-bold">Created : </span>{moment(item.createdAt).format('DD MMMM YYYY, LT')} <br></br>
+                                        <span className="font-bold">Updated : </span>{moment(item.updatedAt).format('DD MMMM YYYY, LT')}
                                       </td>
                                       <td key={item._id} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                                         <button onClick={handleEdit} value={item._id} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
                                           <FiEdit size={21} color={"white"} className="mx-auto"/>
                                         </button>
-                                        <button key={item._id} onClick={handleDelete} value={item._id} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
+                                        <button onClick={handleDelete} value={item._id} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
                                           <TiCancel size={21} color={"white"} className="mx-auto"/>
                                         </button>
                                       </td>

@@ -52,14 +52,16 @@ export const SupplierProvider = props => {
         .then((res) => {
           setFetchStatus(true) 
           alert(res.data.message)
-        }).catch((res) => {
-          alert(res.data.error)
+        }).catch((result) => {
+          alert(result.error)
+          console.log(result.error)
         })
       } else {
         // Update Data
-        axios.put(`http://localhost:5000/api/v1/suppliers${currentId}`, {name, email, phone, address})
+        axios.put(`http://localhost:5000/api/v1/suppliers/${currentId}`, {name, email, phone, address})
         .then((res)=>{
           setFetchStatus(true)
+          alert(res.data.message)
         })
       }
 
@@ -77,15 +79,15 @@ export const SupplierProvider = props => {
 
     // Handling Edit
     const handleEdit = (event) => {
-      let idData = event.target.value
+      let _idData = event.target.value
 
-      setCurrentId(idData)
-      axios.get(`http://localhost:5000/api/v1/suppliers/${idData}`)
+      setCurrentId(_idData)
+      axios.get(`http://localhost:5000/api/v1/suppliers/${_idData}`)
       .then((res) => {
         console.log(res)
         setShowModal(true)
-        let data = res.data
-
+        
+        setCurrentId(_idData)
         setInput(
             {
                 name : res.data.name,
@@ -114,6 +116,7 @@ export const SupplierProvider = props => {
       axios.delete(`http://localhost:5000/api/v1/suppliers/${_idData}`)
       .then((res) => {
         setFetchStatus(true)
+        alert(res.data.message)
       })
     }
 

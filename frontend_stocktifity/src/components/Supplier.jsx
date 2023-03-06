@@ -143,7 +143,7 @@ const Supplier = () => {
                                         {res.address}
                                       </td>
                                       <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                                        <button onClick={handleEdit} value={res.id} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
+                                        <button onClick={handleEdit} value={res._id} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
                                           <FiEdit size={21} color={"white"} className="mx-auto"/>
                                         </button>
                                         <button onClick={handleDelete} value={res._id} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">

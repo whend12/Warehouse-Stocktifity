@@ -50,7 +50,7 @@ const Sidebar = ({children}) => {
     return (
           <>
           <div className="flex relative">
-              <div className={`${isOpen ? "w-[250px]" : "w-16"} fixed min-h-screen duration-500 bg-[#6B728E] border-r-2`}>
+              <div className={`${isOpen ? "w-[250px]" : "w-16"} fixed h-[100%] duration-500 bg-[#6B728E] border-r-2`}>
                   <div className="w-full flex items-center p-5">
                   <img src={logo} alt="stocktifity" className={`${!isOpen && "hidden"} w-9 h-9`}></img><h1 className={`${!isOpen && "hidden"} logo text-white ml-2`}>Stocktifity</h1>
                       <div className={`${isOpen && "ml-5"} bars block text-white`}>
