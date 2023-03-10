@@ -26,8 +26,8 @@ export const searchSupplier = async (req, res) => {
 export const getSupplierById = async (req, res) => {
     try {
         const supplier = await Supplier.findById(req.params.id);
-        if(supplier === null) {
-            return res.status(401).json({message: "Supplier not found"})
+        if (supplier === null) {
+            return res.status(401).json({ message: "Supplier not found" })
         }
         res.status(200).json(supplier);
     } catch (error) {
@@ -39,21 +39,20 @@ export const getSupplierById = async (req, res) => {
 export const createSupplier = async (req, res) => {
     try {
         const existingSupplierName = await Supplier.findOne({ name: req.body.name })
-        const existingSupplierEmail = await Supplier.findOne({ email: req.body.email })
-        const existingSupplierPhone = await Supplier.findOne({ phone: req.body.phone })
-
         if (existingSupplierName) {
-            return res.status(400).json({ error:"Supplier with the same name already exist "});
+            return res.status(400).json({ message: "Supplier with the same name already exist " });
         }
-            else if (existingSupplierEmail) {
-                return res.status(400).json({ error:"Supplier with the same Email already exist "});
+        const existingSupplierEmail = await Supplier.findOne({ email: req.body.email })
+        if (existingSupplierEmail) {
+            return res.status(400).json({ message: "Supplier with the same Email already exist " });
         }
-            else if (existingSupplierPhone) {
-                return res.status(400).json({ error: "Supplier with the same Number Phone already exist "});
+        const existingSupplierPhone = await Supplier.findOne({ phone: req.body.phone })
+        if (existingSupplierPhone) {
+            return res.status(400).json({ message: "Supplier with the same Number Phone already exist " });
         }
 
         const supplier = await Supplier.create(req.body);
-        res.status(201).json({message: " supplier created successfully", supplier});
+        res.status(201).json({ message: " supplier created successfully", supplier });
     } catch (error) {
         res.json({ message: error.message })
     }
@@ -63,10 +62,35 @@ export const createSupplier = async (req, res) => {
 //Update supplier by Id with validate
 export const updateSupplier = async (req, res) => {
     try {
-        const result = await Supplier.findByIdAndUpdate(req.params.id, {$set: req.body})
-        res.status(201).json({message: " supplier updated successfully"});
+        const supplier = await Supplier.findById(req.params.id);
+
+        if(!supplier){
+            return res.status(404).json({message: 'Supplier not found'});
+        }
+
+        const { name, email, phone } = req.body;
+        const existingSupplierName = await Supplier.findOne({ name });
+        const existingSupplierEmail = await Supplier.findOne({ email });
+        const existingSupplierPhone = await Supplier.findOne({ phone });
+
+        if(existingSupplierName && existingSupplierName._id.toString() !== req.params.id){
+            return res.status(400).json({ message: 'A Supplier with the same name Already exists'});
+        }
+
+        if(existingSupplierEmail && existingSupplierEmail._id.toString() !== req.params.id ) {
+            return res.status(400).json({ message: 'A Supplier with the same Email Already exists' });
+        }
+
+        if(existingSupplierPhone && existingSupplierPhone._id.toString() !== req.params.id) {
+            return res.status(400).json({ message: ' A Supplier with the same Number Phone Already exists'})
+        }
+
+        await Supplier.findByIdAndUpdate(req.params.id, { $set: req.body });
+        res.status(200).json({ message: 'Supplier Updated' })
+
+
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 }
 
@@ -75,9 +99,8 @@ export const deleteSupplier = async (req, res) => {
     try {
         const id = req.params.id;
         const data = await Supplier.findByIdAndDelete(id);
-        res.status(201).json({message: " supplier Delete successfully", data});
+        res.status(201).json({ message: " supplier Delete successfully", data });
     } catch (error) {
-        res.status(400).json({ message: error.message }); 
+        res.status(400).json({ message: error.message });
     }
 }
-

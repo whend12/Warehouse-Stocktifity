@@ -49,13 +49,13 @@ export const searchProduct = async (req, res) => {
 export const createProduct = async (req, res) => {
     try {
         const existingProductSku = await Product.findOne({sku: req.body.sku});
+            if (existingProductSku) {
+              return res.status(400).json({error: "SKU already exists"});
+        } ;
         const existingProductName = await Product.findOne({name: req.body.name});
-
-        if (existingProductName) {
+            if (existingProductName) {
             return res.status(400).json({error: "Name already exists"});
-        } else if (existingProductSku) {
-            return res.status(400).json({error: "SKU already exists"});
-        }
+        } ;
 
         const product = await Product.create(req.body);
         res.status(201).json({message: "Product created successfully", product});
@@ -71,15 +71,31 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
     try {
-         await Product.findByIdAndUpdate(req.params.id, {$set: req.body})
-        res.status(200).json({
-            message: "Product Updated", 
-        });
-        
+      const product = await Product.findById(req.params.id);
+  
+      if (!product) {
+        return res.status(404).json({ message: 'Product not found' });
+      }
+  
+      const { name, sku } = req.body;
+      const existingProductByName = await Product.findOne({ name });
+      const existingProductBySku = await Product.findOne({ sku });
+  
+      if (existingProductByName && existingProductByName._id.toString() !== req.params.id) {
+        return res.status(400).json({ message: 'A product with the same name already exists' });
+      }
+  
+      if (existingProductBySku && existingProductBySku._id.toString() !== req.params.id) {
+        return res.status(400).json({ message: 'A product with the same SKU already exists' });
+      }
+  
+      await Product.findByIdAndUpdate(req.params.id, { $set: req.body });
+      res.status(200).json({ message: 'Product updated' });
     } catch (error) {
-        res.json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
-};
+  };
+  
 
 
 //delete product By ID
