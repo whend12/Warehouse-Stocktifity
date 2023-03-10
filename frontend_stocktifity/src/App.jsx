@@ -9,21 +9,22 @@ import Supplier from './components/Supplier'
 import Orderdata from './components/Orderdata'
 import { InventoryProvider } from './context/InventoryContext'
 import { SupplierProvider } from './context/SupplierContext'
+import { OrderProvider } from './context/OrderContext'
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        {/* <Route path="/" element={<Login/>}/> */}
         <Route path="Login" element={<Login/>}/>
       </Routes>
-
+      
       <Sidebar>
+        <OrderProvider>
         <InventoryProvider>
         <SupplierProvider>
           <Routes>
-            <Route path="/" element={<Dashboard/>}/>
-            <Route path="Dashboard" index element={<Dashboard/>}/>
+            <Route exact path="/" element={<Dashboard/>}/>
+            <Route path="Dashboard" element={<Dashboard/>}/>
             <Route path="Inventory" element={<Inventory/>}/>
             <Route path="Order" element={<Order/>}/>
             <Route path="Supplier" element={<Supplier/>}/>
@@ -31,6 +32,7 @@ const App = () => {
           </Routes>
         </SupplierProvider>
         </InventoryProvider>
+        </OrderProvider>
       </Sidebar>
     </Router>
   )

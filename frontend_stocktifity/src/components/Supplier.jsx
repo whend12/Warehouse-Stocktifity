@@ -99,8 +99,7 @@ const Supplier = () => {
                             
                             {/* Table Supplier */}
                             
-                            <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-                              <div className="overflow-hidden">
+                            <div className="py-2 overflow-auto sm:px-6 lg:px-8">
                                 <table className="min-w-full table-fixed border-collapse border border-slate-300">
                                   <thead className="bg-white border-b">
                                     <tr>
@@ -125,33 +124,33 @@ const Supplier = () => {
                                     </tr>
                                   </thead>
                                   <tbody>
-                                  {data !== null && data.map((res,index) => {
+                                  {data !== null && data.map((item,index) => {
                                     return (
-                                    <>
+                                    <React.Fragment key={item._id}>
                                     <tr className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100">
                                       <td className="border border-slate-300 px-6 py-4 whitespace-nowrap text-sm text-center font-medium text-gray-900">{index+1}</td>
                                       <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
-                                        {res.name}
+                                        {item.name}
                                       </td>
                                       <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
-                                        {res.email}
+                                        {item.email}
                                       </td>
                                       <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
-                                        {res.phone}
+                                        {item.phone}
                                       </td>
                                       <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
-                                        {res.address}
+                                        {item.address}
                                       </td>
                                       <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                                        <button onClick={handleEdit} value={res._id} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
+                                        <button onClick={() => handleEdit(item._id)} value={item._id} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
                                           <FiEdit size={21} color={"white"} className="mx-auto"/>
                                         </button>
-                                        <button onClick={handleDelete} value={res._id} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
+                                        <button onClick={() => handleDelete(item._id)} value={item._id} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
                                           <TiCancel size={21} color={"white"} className="mx-auto"/>
                                         </button>
                                       </td>
                                     </tr>
-                                    </>
+                                    </React.Fragment>
                                     )
                                     })}
                                   </tbody>
@@ -172,7 +171,6 @@ const Supplier = () => {
                         </div>
                         
                     </div>
-                </div>
             <Footer/>
         </section>
 

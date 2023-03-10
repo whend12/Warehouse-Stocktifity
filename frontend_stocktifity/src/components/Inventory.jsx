@@ -50,18 +50,36 @@ const Inventory = () => {
       handleDelete
     } = handleFunction
 
-    useEffect(() => {
-      if (fetchStatus === true) {
-        axios.get("http://localhost:5000/api/v1/products")
-        .then ((res) => {
-            setData([...res.data])
-        })
-        .catch((error) => {
-            console.log(error)
-        })
+    // useEffect(() => {
+    //   if (fetchStatus === true) {
+    //     axios.get("http://localhost:5000/api/v1/products")
+    //     .then((res) => {
+    //         setData([...res.data])
+    //     })
+    //     .catch((error) => {
+    //         console.log(error)
+    //     })
+    //     setFetchStatus(false)
+    //   }
+    // }, [fetchStatus,setFetchStatus])    
+
+    useEffect(()=> {
+      let fetchData = async () => {
+        try {
+          let result = await axios.get("http://localhost:5000/api/v1/products")
+          let resultData = result.data
+          setData([...resultData])
+        } catch (error) {
+          console.log(error)
+        }
+      }
+
+      if(fetchStatus){
+        fetchData()
         setFetchStatus(false)
       }
-    }, [fetchStatus,setFetchStatus])    
+
+    }, [fetchStatus,setFetchStatus])
 
     return (
         <>
@@ -125,38 +143,38 @@ const Inventory = () => {
                                   </thead>
                                   <tbody>
                                   {data !== null && data.filter((e) => {
-                                    return search.toLowerCase() === "" ? e : e.sku.toLowerCase().includes(search)
+                                    return search.toLowerCase() === "" ? e : e.sku.toLowerCase().includes(search) + e.name.toLowerCase().includes(search)
                                   }).map((item) => {
                                     return (
-                                    <>
+                                    <React.Fragment key={item._id}>
                                     <tr className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100">
-                                      <td key={item.sku} className="border border-slate-300 px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                      <td className="border border-slate-300 px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {item.sku}
                                       </td>
-                                      <td key={item.name} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
+                                      <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
                                         {item.name}
                                       </td>
-                                      <td key={item.quantity} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
+                                      <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
                                         {item.quantity}
                                       </td>
-                                      <td key={item.category} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
+                                      <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
                                         {item.category}
                                       </td>
-                                      <td key={item.createdAt} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
+                                      <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
                                         <span className="font-bold">Created : </span>{moment(item.createdAt).format('DD MMMM YYYY, LT')} <br></br>
                                         <span className="font-bold">Updated : </span>{moment(item.updatedAt).format('DD MMMM YYYY, LT')}
                                       </td>
-                                      <td key={item._id} className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                                        <button onClick={handleEdit} value={item._id} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
+                                      <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                        <button onClick={() => handleEdit(item._id)} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
                                           <FiEdit size={21} color={"white"} className="mx-auto"/>
                                         </button>
-                                        <button onClick={handleDelete} value={item._id} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
+                                        <button onClick={() => handleDelete(item._id)} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
                                           <TiCancel size={21} color={"white"} className="mx-auto"/>
                                         </button>
                                       </td>
                                     </tr>                               
-                                    </>
-                                    )
+                                    </React.Fragment>
+                                     )
                                     })}
                                   </tbody>
                                 </table>
@@ -176,7 +194,7 @@ const Inventory = () => {
                         </div>
                         
                     </div>
-                </div>
+                </div>  
             <Footer/>
         </section>
 

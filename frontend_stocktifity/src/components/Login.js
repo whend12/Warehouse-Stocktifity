@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 import axios from "axios"
-import { Link, Navigate } from "react-router-dom"
+import { Link, Navigate, useNavigate } from "react-router-dom"
 
 import logo from "../assets/img/logo.png"
 import './Login.css'
@@ -9,16 +9,21 @@ const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
+    const navigate = useNavigate()
 
     const handleSubmit = async (event) => {
-        event.preventdefault()
+        event.preventDefault()
         try {
             const response = await axios.post('http://localhost:5000/api/v1/login', {email, password})
             localStorage.setItem("token", response.data.token)
             alert("success")
-            // Navigate("/Inventory")
+            navigate("/Inventory")
         } catch (error) {
-            setError("Email or password is correct")
+            if(error.response) {
+                const errorMessage = error.response.data
+                setError(errorMessage.message)
+                alert(errorMessage.message)
+            }
         }
     }
 
