@@ -1,5 +1,7 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, {useState, useEffect} from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import jwt_decode from "jwt-decode"
 
 // Import Footer
 import Footer from "../pages/Footer";
@@ -7,7 +9,42 @@ import Footer from "../pages/Footer";
 // Import Icon
 import { BsFillPersonFill } from "react-icons/bs"
 
+
+
 const Dashboard = () => {
+    const [name, setName] = useState('')
+    const [token, setToken] = useState('')
+    const [expire, setExpire] = useState('')
+    const navigate = useNavigate()
+    
+    useEffect(() => {
+        refreshToken()
+    }, [])
+
+    const refreshToken = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/v1/users')
+            setToken(response.data.accessToken)
+            const decoded = jwt_decode(response.data.accessToken)
+            setExpire(decoded.exp)
+            console.log(decoded)
+        } catch (error) {
+            console.log(error)
+            if(error.response) {
+                navigate("/Login")
+            }
+        }
+    }
+    
+    const getUsers = async () => {
+        const response = await axios.get('http://localhost:5000/api/v1/users', {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        })
+        console.log(response.data)
+    }
+
     return (
         <>
         <div className="w-full">
