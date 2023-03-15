@@ -40,15 +40,15 @@ export const createSupplier = async (req, res) => {
     try {
         const existingSupplierName = await Supplier.findOne({ name: req.body.name })
         if (existingSupplierName) {
-            return res.status(400).json({ message: "Supplier with the same name already exist " });
+            return res.status(400).json({ messageName: "Supplier with the same name already exist " });
         }
         const existingSupplierEmail = await Supplier.findOne({ email: req.body.email })
         if (existingSupplierEmail) {
-            return res.status(400).json({ message: "Supplier with the same Email already exist " });
+            return res.status(400).json({ messageEmail: "Supplier with the same Email already exist " });
         }
         const existingSupplierPhone = await Supplier.findOne({ phone: req.body.phone })
         if (existingSupplierPhone) {
-            return res.status(400).json({ message: "Supplier with the same Number Phone already exist " });
+            return res.status(400).json({ messagePhone: "Supplier with the same Number Phone already exist " });
         }
 
         const supplier = await Supplier.create(req.body);
@@ -74,15 +74,15 @@ export const updateSupplier = async (req, res) => {
         const existingSupplierPhone = await Supplier.findOne({ phone });
 
         if(existingSupplierName && existingSupplierName._id.toString() !== req.params.id){
-            return res.status(400).json({ message: 'A Supplier with the same name Already exists'});
+            return res.status(400).json({ messageName: 'A Supplier with the same name Already exists'});
         }
 
         if(existingSupplierEmail && existingSupplierEmail._id.toString() !== req.params.id ) {
-            return res.status(400).json({ message: 'A Supplier with the same Email Already exists' });
+            return res.status(400).json({ messageEmail: 'A Supplier with the same Email Already exists' });
         }
 
         if(existingSupplierPhone && existingSupplierPhone._id.toString() !== req.params.id) {
-            return res.status(400).json({ message: ' A Supplier with the same Number Phone Already exists'})
+            return res.status(400).json({ messagePhone: ' A Supplier with the same Number Phone Already exists'})
         }
 
         await Supplier.findByIdAndUpdate(req.params.id, { $set: req.body });

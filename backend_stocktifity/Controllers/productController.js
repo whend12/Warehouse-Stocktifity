@@ -50,11 +50,11 @@ export const createProduct = async (req, res) => {
     try {
         const existingProductSku = await Product.findOne({sku: req.body.sku});
             if (existingProductSku) {
-              return res.status(400).json({error: "SKU already exists"});
+              return res.status(400).json({messageSku: "SKU already exists"});
         } ;
         const existingProductName = await Product.findOne({name: req.body.name});
             if (existingProductName) {
-            return res.status(400).json({error: "Name already exists"});
+            return res.status(400).json({messageName: "Name already exists"});
         } ;
 
         const product = await Product.create(req.body);
@@ -82,11 +82,11 @@ export const updateProduct = async (req, res) => {
       const existingProductBySku = await Product.findOne({ sku });
   
       if (existingProductByName && existingProductByName._id.toString() !== req.params.id) {
-        return res.status(400).json({ message: 'A product with the same name already exists' });
+        return res.status(400).json({ messageName: 'A product with the same name already exists' });
       }
   
       if (existingProductBySku && existingProductBySku._id.toString() !== req.params.id) {
-        return res.status(400).json({ message: 'A product with the same SKU already exists' });
+        return res.status(400).json({ messageSku: 'A product with the same SKU already exists' });
       }
   
       await Product.findByIdAndUpdate(req.params.id, { $set: req.body });

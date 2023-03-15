@@ -35,7 +35,7 @@ export const Login = async(req, res) => {
         const user = await Users.findOne({ 
             email: req.body.email });
         const match = await bcrypt.compare(body.password, user.password);
-        if(!match) return res.status(400).json({message: "Wrong Password"});
+        if(!match) return res.status(400).json({messagePassword: "Wrong Password"});
         const userId = user.id;
         const name = user.name;
         const email = user.email;
@@ -56,7 +56,7 @@ export const Login = async(req, res) => {
         });
         res.json({ accessToken });
     } catch (error) {
-        res.status(404).json({message: "Email tidak ditemukan"});
+        res.status(404).json({messageEmail: "Email tidak ditemukan"});
         
     }
 };
