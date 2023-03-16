@@ -1,0 +1,30 @@
+GET http://localhost:5000/api/v1/pending/
+
+###
+//end-point outbound-history setelah di approve
+GET http://localhost:5000/api/v1/outbound-history/
+
+###
+//end-point inbound-history setelah di approve
+GET http://localhost:5000/api/v1/inbound-history/
+
+###
+POST  http://localhost:5000/api/v1/pending
+Content-Type: application/json
+
+{
+    "name": "penghapus 4B",
+    "quantity": 570,
+    "sku": "A0014",
+    "category": "Alat Tulis",
+    "Supplier": "6411bca2212fe22a1161502e"
+}
+
+###
+// end-point untuk inbound status pending
+PUT http://localhost:5000/api/v1/inbound/64131686cc688ab16a2bddb4
+
+###
+//// end-point untuk outbound status pending
+PUT http://localhost:5000/api/v1/outbond/6412d588b6209bcac8cafb15
+

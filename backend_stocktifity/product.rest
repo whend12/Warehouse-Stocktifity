@@ -10,7 +10,8 @@ Content-Type: application/json
     "name": "penghapus 43B",
     "quantity": 100,
     "sku": "A0013",
-    "category": "Alat Tulis"
+    "category": "Alat Tulis",
+    "Supplier": "6411bca2212fe22a1161502e"
 }
 
 ###

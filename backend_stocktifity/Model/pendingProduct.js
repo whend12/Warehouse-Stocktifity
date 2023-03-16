@@ -1,7 +1,6 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const productSchema = mongoose.Schema(
-    {
+const pendingProductSchema = mongoose.Schema({
     name: {
         type: String,
         required: [true, "Please enter product name"],
@@ -30,6 +29,10 @@ const productSchema = mongoose.Schema(
         type: mongoose.Schema.ObjectId,
         ref: "Supplier",
         required: true
+    },
+    confirmed: {
+        type: Boolean,
+        default: false
     }
 },
     {
@@ -37,6 +40,6 @@ const productSchema = mongoose.Schema(
     }
 )
 
-const Product = mongoose.model("Product", productSchema);
+const PendingProduct = mongoose.model("PendingProduct", pendingProductSchema);
 
-export default Product;
+export default PendingProduct;
