@@ -5,6 +5,6 @@ export const getOutBoundHistory = async (req, res) => {
     const OutboundHistory = await outboundHistory.find().populate('product.supplierId', 'name');
     res.status(200).json(OutboundHistory);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };

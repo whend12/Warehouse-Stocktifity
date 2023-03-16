@@ -21,7 +21,6 @@ export const createPendingProduct = async (req, res) => {
 }
 
 //get all pending products
-
 export const getAllPendingProducts = async (req, res) => {
     try {
         const pendingProducts = await PendingProduct.find().populate("Supplier", "name");
@@ -39,25 +38,33 @@ export const getAllPendingProducts = async (req, res) => {
 
 //confirmed pending product and passing it to product model
 export const inbound = async (req, res) => {
-    const pendingProduct = await PendingProduct.findById(req.params.id);
-    if (!pendingProduct) {
-        return res.status(404).send('Product not found');
-    }
-    if (pendingProduct.confirmed) {
-        return res.status(400).send('Product already confirmed');
-    }
-    const { name, sku, supplier, quantity } = pendingProduct;
-    let product = await Product.findOne({ name, sku, supplier });
-    if (!product) {
-        product = new Product({ name, sku, supplier, quantity });
-    } else {
-        product.quantity += quantity;
+    try {
+        const pendingProduct = await PendingProduct.findById(req.params.id);
+        if (!pendingProduct) {
+            return res.status(404).send('Product not found');
+        }
+        if (pendingProduct.confirmed) {
+            return res.status(400).send('Product already confirmed');
+        }
+        const { name, sku, supplier, quantity,category } = pendingProduct;
+        let product = await Product.findOne({ name, sku, supplier ,category});
+        if (!product) {
+            product = new Product({ name, sku, supplier, quantity,category });
+        } else {
+            product.quantity += quantity;
+        }
+        await product.save();
+        //history-inbound
+        const supplierObj = await Supplier.findById(product.Supplier);
+        // Tandai produk sebagai sudah dikonfirmasi
+        await inboundHistory.create({ product: { name, sku, supplierId: supplierObj._id, category }, quantity, confirmed: true });
+
+        await pendingProduct.delete();
+        res.send('Product confirmed');
+    } catch (error) {
+        res.status(400).json({ message: error.message })
     }
 
-    await PendingProduct.findByIdAndUpdate(req.params.id, { confirmed: true });
-    await product.save();
-    await PendingProduct.delete();
-    res.send('Product confirmed');
 };
 
 
@@ -81,6 +88,9 @@ export const outbond = async (req, res) => {
         if (!product) {
             return res.status(404).send('Product not found');
         }
+            if(product.quantity < 0){
+                return res.status(400).send('Product quantity is not enough');
+        }
         // Cari supplier berdasarkan id
         const supplierObj = await Supplier.findById(product.Supplier);
 
@@ -91,7 +101,7 @@ export const outbond = async (req, res) => {
         res.send('Product confirmed');
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: error.message });
+        res.status(400).send({ message: error.message });
     }
 };
 

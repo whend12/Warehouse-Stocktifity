@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import Supplier from '../model/supplierModels.js';
 
 
 const outboundHistorySchema = new mongoose.Schema({

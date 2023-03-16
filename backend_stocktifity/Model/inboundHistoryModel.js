@@ -1,33 +1,48 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+
+
 
 const inboundHistorySchema = new mongoose.Schema({
-    productName: {
+  product: {
+    name: {
       type: String,
-      required: true
-    },
-    quantity: {
-      type: Number,
-      required: true
+      required: true,
     },
     sku: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     category: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
-    supplier: {
-        type: mongoose.Schema.ObjectId,
-        ref: "Supplier",
-        required: true
+    supplierId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Supplier',
+      required: true,
+      validate: {
+        validator: async function (v) {
+          const supplier = await mongoose.model('Supplier').findById(v);
+          return supplier !== null;
+        },
+        message: 'Supplier is not valid',
+      },
     },
-    date: {
-      type: Date,
-      default: Date.now
-    }
-  });
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  confirmed: {
+    type: Boolean,
+    default: false
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
-  const inboundHistory = mongoose.model("inboundHistory", inboundHistorySchema)
+const inboundHistory = mongoose.model('inboundHistory', inboundHistorySchema);
 
-  export default inboundHistory;
+export default inboundHistory;

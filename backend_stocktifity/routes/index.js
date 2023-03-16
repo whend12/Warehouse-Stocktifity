@@ -28,6 +28,10 @@ import{
     getOutBoundHistory
 } from '../Controllers/outboundHistory.js'
 
+import{
+    getInBoundHistory
+} from '../Controllers/inboundHistory.js'
+
 import {
     getUsers,
     Register,
@@ -70,6 +74,9 @@ router.route('/outbond/:id')
 //outbound-history
 router.route('/outbound-history')
 .get(getOutBoundHistory)
+//inbound-history
+router.route('/inbound-history')
+.get(getInBoundHistory)
 
 
 //Supplier Route
