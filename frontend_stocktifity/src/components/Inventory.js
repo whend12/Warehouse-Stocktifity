@@ -1,7 +1,6 @@
 import React, { useEffect, useContext } from "react";
 import axios from "axios";
 import moment from "moment";
-import { Alert } from "@mui/material";
 
 // Import File
 import "./Inventory.css";
@@ -9,19 +8,59 @@ import Footer from "../pages/Footer";
 import { InventoryContext } from "../context/InventoryContext";
 
 // Import Icon
-
 import { AiFillPlusSquare } from "react-icons/ai";
 import { FiEdit } from "react-icons/fi";
 import { TiCancel } from "react-icons/ti";
 import { ImCancelCircle } from "react-icons/im";
+import SearchSharpIcon from "@mui/icons-material/SearchSharp";
+
+// Import from MUI
+import { Alert } from "@mui/material";
+import { TablePagination } from "@mui/material";
+import TableContainer from "@mui/material/TableContainer";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableSortLabel from "@mui/material/TableSortLabel";
 
 const Inventory = () => {
   const { state, handleFunction } = useContext(InventoryContext);
 
-  let { showModal, setShowModal, open, setOpen, search, setSearch, order, setOrder, page, setPage, data, setData, fetchStatus, setFetchStatus, currentSku, setCurrentSku, input, setInput, errorName, setErrorName, errorSku, setErrorSku } =
-    state;
+  let {
+    showModal,
+    setShowModal,
+    open,
+    setOpen,
+    search,
+    setSearch,
+    order,
+    setOrder,
+    orderBy,
+    setOrderBy,
+    page,
+    setPage,
+    data,
+    setData,
+    fetchStatus,
+    setFetchStatus,
+    currentSku,
+    setCurrentSku,
+    input,
+    setInput,
+    success,
+    setSuccess,
+    errorName,
+    setErrorName,
+    errorSku,
+    setErrorSku,
+    rowsPerPage,
+    setRowsPerPage,
+  } = state;
 
-  let { handleClickOpen, handleClose, sorting, handleInput, handleSubmit, handleEdit, handleDelete } = handleFunction;
+  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleEdit, handleDelete, filteredData, handleChangePage, handleChangeRowsPerPage, handleRequestSort, getComparator, descendingComparator, stableSort } = handleFunction;
 
   // useEffect(() => {
   //   if (fetchStatus === true) {
@@ -40,8 +79,7 @@ const Inventory = () => {
     let fetchData = async () => {
       try {
         let result = await axios.get("http://localhost:5000/api/v1/products");
-        let resultData = result.data;
-        setData([...resultData]);
+        setData(result.data);
       } catch (error) {
         console.log(error);
       }
@@ -52,6 +90,15 @@ const Inventory = () => {
       setFetchStatus(false);
     }
   }, [fetchStatus, setFetchStatus]);
+
+  const columns = [
+    { id: "sku", label: "SKU" },
+    { id: "name", label: "Name" },
+    { id: "quantity", label: "Quantity" },
+    { id: "category", label: "Category" },
+    { id: "date", label: "Date" },
+    { id: "action", label: "Action" },
+  ];
 
   return (
     <>
@@ -71,13 +118,21 @@ const Inventory = () => {
             <div className="w-full sm:-mx-6 lg:-mx-8 bg-[#ffffff] rounded-lg shadow-lg">
               {/* Subtitle */}
 
-              <h2 className="font-bold mt-2 ml-8">List Inventory</h2>
+              <h2 className="font-bold mt-4 ml-8 text-xl text-center uppercase">Inventory</h2>
               <div className="flex justify-between items-center">
                 <div className="search ml-8">
                   <label htmlFor="search" className="text-black">
                     Search:
                   </label>
-                  <input onChange={(e) => setSearch(e.target.value)} type="search" id="search" name="search" className="w-1/2 border border-black ml-2 shadow-none outline-none focus:outline-none hover:outline-none" />
+                  <input
+                    onChange={(e) => setSearch(e.target.value)}
+                    value={search}
+                    type="search"
+                    id="search"
+                    name="search"
+                    className="w-1/2 border border-black rounded-lg ml-2 shadow-none outline-none focus:outline-none hover:outline-none"
+                  />
+                  {/* <span className="px-2"><SearchSharpIcon/></span> */}
                 </div>
                 <div className="btn-create">
                   <button onClick={() => setShowModal(true)} className="flex items-center w-[6rem] bg-[#03C988] text-white mr-8 p-1 rounded shadow-xl hover:bg-[#03C4A1] focus:outline-none">
@@ -87,11 +142,11 @@ const Inventory = () => {
                 </div>
               </div>
 
-              {/* Table Supplier */}
+              {/* Table Inventory */}
 
               <div className="py-2 sm:px-6 lg:px-8">
                 <div className="overflow-auto">
-                  <table className="min-w-full table-fixed border-collapse border border-slate-300">
+                  {/* <table className="min-w-full table-fixed border-collapse border border-slate-300">
                     <thead className="bg-white border-b">
                       <tr>
                         <th onClick={() => sorting("sku")} scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left">
@@ -147,9 +202,50 @@ const Inventory = () => {
                             );
                           })}
                     </tbody>
-                  </table>
+                  </table> */}
+                  <TableContainer component={Paper}>
+                    <Table sx={{ minWidth: 650 }}>
+                      <TableHead>
+                        <TableRow>
+                          {columns.map((column) => (
+                            <TableCell key={column._id} sortDirection={orderBy === column.id ? order : false}>
+                              <TableSortLabel hideSortIcon direction={orderBy === column.id ? order : "asc"} onClick={() => handleRequestSort(column.id)}>
+                                <span className="font-bold">{column.label}</span>
+                              </TableSortLabel>
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {stableSort(filteredData, getComparator(order, orderBy))
+                          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                          .map((row) => (
+                            <TableRow key={row.id}>
+                              <TableCell>{row.sku}</TableCell>
+                              <TableCell>{row.name}</TableCell>
+                              <TableCell>{row.quantity}</TableCell>
+                              <TableCell>{row.category}</TableCell>
+                              <TableCell>
+                                <span className="font-bold">Created : </span>
+                                {moment(row.createdAt).format("DD MMMM YYYY, LT")} <br></br>
+                                <span className="font-bold">Updated : </span>
+                                {moment(row.updatedAt).format("DD MMMM YYYY, LT")}
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                <button onClick={() => handleEdit(row._id)} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
+                                  <FiEdit size={21} color={"white"} className="mx-auto" />
+                                </button>
+                                <button onClick={() => handleDelete(row._id)} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
+                                  <TiCancel size={21} color={"white"} className="mx-auto" />
+                                </button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </div>
-                <div className="flex flex-col items-center w-full px-4 py-2 space-y-2 text-sm text-gray-500 sm:justify-between sm:space-y-0 sm:flex-row">
+                {/* <div className="flex flex-col items-center w-full px-4 py-2 space-y-2 text-sm text-gray-500 sm:justify-between sm:space-y-0 sm:flex-row">
                   <p className="flex">
                     Showing&nbsp;<span className="font-bold"> 1 to 5 </span>&nbsp;of 5 entries
                   </p>
@@ -158,14 +254,23 @@ const Inventory = () => {
                       Previous
                     </a>
                     <div className="flex flex-row space-x-1">
-                      <div className="flex px-2 py-px text-white bg-blue-400 border border-blue-400">1</div>
-                      <div className="flex px-2 py-px border border-blue-400 hover:bg-blue-400 hover:text-white">2</div>
+                    <div className="flex px-2 py-px text-white bg-blue-400 border border-blue-400">1</div>
+                    <div className="flex px-2 py-px border border-blue-400 hover:bg-blue-400 hover:text-white">2</div>
                     </div>
                     <a href="#" className="hover:text-gray-600">
-                      Next
+                    Next
                     </a>
-                  </div>
-                </div>
+                    </div>
+                  </div> */}
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 15]}
+                  component="div"
+                  count={data.length}
+                  rowsPerPage={rowsPerPage}
+                  page={Math.max(0, Math.min(page, Math.ceil(data.length / rowsPerPage) - 1))}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
               </div>
             </div>
           </div>
@@ -178,9 +283,9 @@ const Inventory = () => {
       {showModal ? (
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="absolute top-5 right-5">{success && <Alert severity="success">{success}</Alert>}</div>
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
-
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {/*header*/}
 
