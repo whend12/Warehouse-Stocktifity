@@ -2,9 +2,10 @@ import Product from '../model/productModels.js'
 
 
 
+
 export const getProducts = async (req, res) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find().populate("Supplier","name");
         res.json(products);
     } catch (error) {
         res.json({ message: error.message });
@@ -14,7 +15,7 @@ export const getProducts = async (req, res) => {
 //getProductById
 export const getProductById = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findById(req.params.id).populate("Supplier");
         if(product === null){
             return res.status(401).json({message: "Product not found"})
         }

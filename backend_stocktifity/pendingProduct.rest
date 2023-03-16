@@ -1,0 +1,22 @@
+GET http://localhost:5000/api/v1/pending/
+
+
+
+###
+POST  http://localhost:5000/api/v1/pending
+Content-Type: application/json
+
+{
+    "name": "penghapus 4B",
+    "quantity": 15,
+    "sku": "A0014",
+    "category": "Alat Tulis",
+    "Supplier": "6411bca2212fe22a1161502e"
+}
+
+###
+PUT http://localhost:5000/api/v1/inbound/6411e7d30ff27ea72b6a949a
+
+###
+PUT http://localhost:5000/api/v1/outbond/6411dd5876fa03a0d46225c9
+
