@@ -5,7 +5,7 @@ import swal from "sweetalert";
 export const InventoryContext = createContext();
 
 export const InventoryProvider = (props) => {
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false); // modal input
   const [open, setOpen] = useState(false);
   const [data, setData] = useState([]); // fetching data
   const [fetchStatus, setFetchStatus] = useState(true); // indikator
@@ -13,7 +13,6 @@ export const InventoryProvider = (props) => {
 
   // Search
   const [search, setSearch] = useState("");
-  const filteredData = data.filter((row) => row.sku.toLowerCase().includes(search.toLowerCase()) || row.name.toLowerCase().includes(search.toLowerCase()));
 
   // Handle Success
   const [success, setSuccess] = useState("");
@@ -41,6 +40,112 @@ export const InventoryProvider = (props) => {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  // Handling Input
+  const [suppliers, setSuppliers] = useState([]);
+
+  const [input, setInput] = useState({
+    name: "",
+    quantity: "",
+    sku: "",
+    category: "",
+    Supplier: "",
+  });
+
+  const handleInput = (event) => {
+    let name = event.target.name;
+    let value = event.target.value;
+
+    setInput({ ...input, [name]: value });
+  };
+
+  // Handling Submit
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    let { name, quantity, sku, category, Supplier } = input;
+
+    try {
+
+      const supplierId = suppliers.find((supplier) => supplier.name === Supplier)?._id;
+
+      if (currentId === -1) {
+        // Create Data
+        const result = await axios.post("http://localhost:5000/api/v1/products", { name, quantity, sku, category, Supplier: supplierId });
+        setFetchStatus(true);
+        setSuccess(result.data.message);
+        setTimeout(() => {
+          window.location.reload();
+          setSuccess(null);
+        }, 4000);
+      } else {
+        // Update Data
+        const result = await axios.put(`http://localhost:5000/api/v1/products/${currentId}`, { name, quantity, sku, category, Supplier: supplierId });
+        setFetchStatus(true);
+        setSuccess(result.data.message);
+        setTimeout(() => {
+          setSuccess(null);
+        }, 4000);
+      }
+
+      setInput({
+        name: "",
+        quantity: "",
+        sku: "",
+        category: "",
+        Supplier: "",
+      });
+
+      setCurrentId(-1);
+    } catch (error) {
+      if (error.response) {
+        const errorMessage = error.response.data;
+        setErrorName(errorMessage.messageName);
+        setErrorSku(errorMessage.messageSku);
+        console.log(error.response.data);
+      }
+    }
+  };
+
+  // Handling Edit
+  const [edit, setEdit] = useState(false);
+
+  const handleEdit = async (_id) => {
+    console.log(_id);
+
+    try {
+      const res = await axios.get(`http://localhost:5000/api/v1/products/${_id}`);
+      setShowModal(true);
+      setEdit(true);
+      setCurrentId(res.data._id);
+      setInput({ ...input, name: res.data.name, quantity: res.data.quantity, sku: res.data.sku, category: res.data.category, Supplier: res.data.Supplier });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Handling Delete
+  const handleDelete = async (_id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/v1/products/${_id}`);
+      swal({
+        title: "Are you sure?",
+        text: "You want to delete this item? this process cannot be undone",
+        icon: "warning",
+        dangerMode: true,
+        buttons: true,
+      }).then((willDelete) => {
+        if (willDelete) {
+          window.location.reload();
+          setFetchStatus(true);
+          swal("Item Deleted Successfully", {
+            icon: "success",
+          });
+        } else {
+        }
+      });
+    } catch {}
   };
 
   // Sort table data
@@ -76,114 +181,6 @@ export const InventoryProvider = (props) => {
     });
     return stabilizedThis.map((el) => el[0]);
   };
-  // const sorting = (col) => {
-  //   if (order === "ASC") {
-  //     const sorted = [...data].sort((a, b) => (a[col].toLowerCase() > b[col].toLowerCase() ? 1 : -1));
-  //     setData(sorted);
-  //     setOrder("DSC");
-  //   }
-
-  //   if (order === "DSC") {
-  //     const sorted = [...data].sort((a, b) => (a[col].toLowerCase() < b[col].toLowerCase() ? 1 : -1));
-  //     setData(sorted);
-  //     setOrder("ASC");
-  //   }
-  // };
-
-  // Handling Input
-  const [input, setInput] = useState({
-    name: "",
-    quantity: "",
-    sku: "",
-    category: "",
-  });
-
-  const handleInput = (event) => {
-    let name = event.target.name;
-    let value = event.target.value;
-
-    setInput({ ...input, [name]: value });
-  };
-
-  // Handling Submit
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    let { name, quantity, sku, category } = input;
-
-    try {
-      if (currentId === -1) {
-        // Create Data
-        const result = await axios.post("http://localhost:5000/api/v1/products", { name, quantity, sku, category });
-        setFetchStatus(true);
-        setSuccess(result.data.message);
-        setTimeout(() => {
-          window.location.reload();
-          setSuccess(null);
-        }, 4000);
-      } else {
-        // Update Data
-        const result = await axios.put(`http://localhost:5000/api/v1/products/${currentId}`, { name, quantity, sku, category });
-        setFetchStatus(true);
-        setSuccess(result.data.message);
-        setTimeout(() => {
-          setSuccess(null);
-        }, 4000);
-      }
-
-      setInput({
-        name: "",
-        quantity: "",
-        sku: "",
-        category: "",
-      });
-
-      setCurrentId(-1);
-    } catch (error) {
-      if (error.response) {
-        const errorMessage = error.response.data;
-        setErrorName(errorMessage.messageName);
-        setErrorSku(errorMessage.messageSku);
-      }
-    }
-  };
-
-  // Handling Edit
-  const handleEdit = async (_idData) => {
-    console.log(_idData);
-
-    try {
-      const res = await axios.get(`http://localhost:5000/api/v1/products/${_idData}`);
-      setShowModal(true);
-      setCurrentId(res.data._id);
-      setInput({ ...input, name: res.data.name, quantity: res.data.quantity, sku: res.data.sku, category: res.data.category });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // Handling Delete
-  const handleDelete = async (_idData) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/v1/products/${_idData}`);
-      swal({
-        title: "Are you sure?",
-        text: "You want to delete this item? this process cannot be undone",
-        icon: "warning",
-        dangerMode: true,
-        buttons: true,
-      }).then((willDelete) => {
-        if (willDelete) {
-          window.location.reload();
-          setFetchStatus(true);
-          swal("Item Deleted Successfully", {
-            icon: "success",
-          });
-        } else {
-        }
-      });
-    } catch {}
-  };
 
   let state = {
     showModal,
@@ -212,6 +209,10 @@ export const InventoryProvider = (props) => {
     setErrorSku,
     rowsPerPage,
     setRowsPerPage,
+    suppliers,
+    setSuppliers,
+    edit,
+    setEdit,
   };
 
   let handleFunction = {
@@ -221,7 +222,6 @@ export const InventoryProvider = (props) => {
     handleSubmit,
     handleEdit,
     handleDelete,
-    filteredData,
     handleChangePage,
     handleChangeRowsPerPage,
     handleRequestSort,

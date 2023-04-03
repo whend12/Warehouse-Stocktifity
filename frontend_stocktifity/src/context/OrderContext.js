@@ -1,220 +1,241 @@
-import axios from "axios"
-import React, {createContext, useState} from "react"
-import swal from "sweetalert"
+import axios from "axios";
+import React, { createContext, useState } from "react";
+import swal from "sweetalert";
 
-export const OrderContext = createContext()
+export const OrderContext = createContext();
 
-export const OrderProvider = props => {
-    const [showModal, setShowModal] = useState(false)
-    const [open, setOpen] = useState(false)
-    const [page, setPage] = useState(1) // Table Pagination
-    const [data, setData] = useState([]) // fetching data
-    const [fetchStatus, setFetchStatus] = useState(true) // indikator
-    const [search, setSearch] = useState("") // Search
-    const [currentId, setCurrentId] = useState(-1)
+export const OrderProvider = (props) => {
+  const [showModal, setShowModal] = useState(false); // modal input
+  const [open, setOpen] = useState(false);
+  const [dataPending, setDataPending] = useState([]); // fetching data
+  const [dataProducts, setDataProducts] = useState(); // fetching data Products
+  const [fetchStatus, setFetchStatus] = useState(true); // indikator
+  const [currentId, setCurrentId] = useState(-1);
 
-    const handleClickOpen = () => {
-      setOpen(true)
-    }
+  // Search
+  const [search, setSearch] = useState("");
 
-    const handleClose = () => {
-      setOpen(false)
-    }
+  // Handle Success
+  const [success, setSuccess] = useState(null);
 
-    // sort table data
-    const [order, setOrder] = useState("ASC")
-    const sorting = (col) => {
-      if (order === "ASC") {
-        const sorted = [...data].sort((a,b) => 
-        a[col].toLowerCase() > b[col].toLowerCase() ? 1 : -1
-        )
-        setData(sorted)
-        setOrder("DSC")
-      }
+  // Handle Error
+  const [error, setError] = useState("");
+  const [errorName, setErrorName] = useState("");
+  const [errorSku, setErrorSku] = useState("");
 
-      if (order === "DSC") {
-        const sorted = [...data].sort((a,b) => 
-        a[col].toLowerCase() < b[col].toLowerCase() ? 1 : -1
-        )
-        setData(sorted)
-        setOrder("ASC")
-      }
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
-    }
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-    // Handling Input
-    const [input, setInput] = useState (
-      {
-          name : "",
-          quantity : "",
-          sku : "",
-          category : ""
-      }
-    )
+  // Handling Input
+  const [suppliers, setSuppliers] = useState([]);
 
-    const handleInput = (event) => {
-        let name = event.target.name
-        let value = event.target.value
+  const [input, setInput] = useState({
+    name: "",
+    quantity: "",
+    sku: "",
+    category: "",
+    Supplier: "",
+  });
 
-        setInput({...input, [name] : value})
-    }
+  const handleInput = (event) => {
+    let name = event.target.name;
+    let value = event.target.value;
 
-    // Handling Submit
-    const handleSubmit = (event) => {
-      event.preventDefault()
+    setInput({ ...input, [name]: value });
+  };
 
-      let { 
-        name,
-        quantity,
-        sku,
-        category 
-      } = input
+  const handleSelect = (event) => {
+    let sku = event.target.value;
+    let selectedProduct = dataProducts.find((product) => product.sku === sku);
+    console.log(selectedProduct.Supplier);
+    setInput({...selectedProduct, quantity: 0});
+  };
+
+  // Handling Submit
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    let { name, quantity, sku, category, Supplier } = input;
+
+    try {
+      const supplierId = suppliers.find((supplier) => supplier.name === Supplier)?._id;
 
       if (currentId === -1) {
-        // Created Data
-        axios.post("http://localhost:5000/api/v1/products", {name, quantity, sku, category})
-        .then((result) => {
-            window.location.reload()
-            setFetchStatus(true)
-            swal(result.data.message)
-        }).catch((error)=>{
-          alert(error.message)
-          console.log(error.message)
-        })
-      } else {
-        // Update Data
-        axios.put(`http://localhost:5000/api/v1/products/${currentId}`,{name , quantity, sku, category})
-        .then((result)=>{
-          // window.location.reload()
-          setFetchStatus(true)
-          alert(result.data.message)
-        }).catch((error)=>{
-          console.log(error)
-        })
+        // Create Data
+        const result = await axios.post("http://localhost:5000/api/v1/pending", { name, quantity, sku, category, Supplier: supplierId || input.Supplier });
+        setFetchStatus(true);
+        setSuccess("Success Create");
+        setTimeout(() => {
+          window.location.reload();
+          setSuccess(null);
+        }, 3000);
       }
 
-      setCurrentId(-1)
+      setInput({
+        name: "",
+        sku: "",
+        quantity: "",
+        category: "",
+        Supplier: "",
+      });
 
-      setInput(
-        {
-          name: "",
-          quantity: "",
-          sku: "",
-          category: ""
-        }
-      )
+      setCurrentId(-1);
+    } catch (error) {
+      console.log(error.message);
+      if (error.response) {
+        const errorMessage = error.response.data;
+        setErrorName(errorMessage.messageName);
+        setErrorSku(errorMessage.messageSku);
+      }
     }
+  };
 
-    // Handling Edit
-    const handleEdit = (event) => {
-      let _idData = event.target.value
-      
-      setCurrentId(_idData)
-      axios.get(`http://localhost:5000/api/v1/products/${_idData}`)
-      .then((result) => {
-        
-        setShowModal(true)
-        console.log(_idData)
-
-        setCurrentId(result.data._id)
-        setInput(
-          {
-            name : result.data.name,
-            quantity : result.data.quantity,
-            sku : result.data.sku,
-            category : result.data.category
-          }
-        )
-      })
+  // Handling Confirm
+  const handleConfirm = async (_id) => {
+    try {
+      const response = await axios.put(`http://localhost:5000/api/v1/outbond/${_id}`);
+      setFetchStatus(true);
+      setSuccess(response.data.message);
+      setTimeout(() => {
+        setSuccess(null);
+      }, 2000);
+    } catch (error) {
+      if (error.response) {
+        setError(error.response.data);
+        setTimeout(() => {
+          setError(null);
+        }, 2000);
+      }
     }
+  };
 
-    // Handling Delete
-    const handleDelete = async (event) => {
-      try {
-        let _idData = event.target.value
-        await axios.delete(`http://localhost:5000/api/v1/products/${_idData}`)
-        swal({
-          title: 'Are you sure?',
-          text: "You want to delete this item? this process cannot be undone",
-          icon: 'warning',
-          dangerMode: true,
-          buttons: true,
-        }).then((willDelete) => {
-          if (willDelete) {
-            window.location.reload()
-            setFetchStatus(true)
-            swal("Item Deleted Successfully", {
-              icon: "success",
-            })
+  // Handling Delete
+  const handleDelete = async (_id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/v1/pending/${_id}`);
+      swal({
+        title: "Are you sure?",
+        text: "You want to delete this item? this process cannot be undone",
+        icon: "warning",
+        dangerMode: true,
+        buttons: true,
+      }).then((willDelete) => {
+        if (willDelete) {
+          window.location.reload();
+          setFetchStatus(true);
+          swal("Item Deleted Successfully", {
+            icon: "success",
+          });
         } else {
-
         }
-        
-      })
-    } catch {
-      
+      });
+    } catch (error) {
+      console.log(error.message);
     }
+  };
+
+  // Sort table data
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("sku");
+
+  const handleRequestSort = (property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
+  const getComparator = (order, orderBy) => {
+    return order === "desc" ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
+  };
+
+  const descendingComparator = (a, b, orderBy) => {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
     }
-
-    // const handleDelete = async (event) => {
-    //   try {
-    //     let skuData = String(event.target.value)
-    //     axios.delete(`http://localhost:5000/api/v1/products/${skuData}`)
-    //     swal({
-    //       title: 'Are you sure?',
-    //       text: "You want to delete this item? this process cannot be undone",
-    //       icon: 'warning',
-    //       dangerMode: true,
-    //       buttons: true,
-    //     }).then((willDelete) => {
-    //       if (willDelete) {
-    //         window.location.reload()
-    //         setFetchStatus(true)
-    //         swal("Item Deleted Successfully", {
-    //           icon: "success",
-    //         })
-    //     } else {
-
-    //     }
-    //   })
-    //   } catch {
-    //     console.log("error")
-    //   }
-    // }
-
-    let state = {
-        showModal,
-        setShowModal,
-        open,
-        setOpen,
-        search,
-        setSearch,
-        order,
-        setOrder,
-        page,
-        setPage,
-        data,
-        setData,
-        fetchStatus,
-        setFetchStatus,
-        input,
-        setInput
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
     }
-    
+    return 0;
+  };
 
-    let handleFunction = {
-        handleClickOpen,
-        handleClose,
-        sorting,
-        handleInput,
-        handleSubmit,
-        handleEdit,
-        handleDelete
-    }
+  const stableSort = (array, comparator) => {
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+      const order = comparator(a[0], b[0]);
+      if (order !== 0) return order;
+      return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+  };
 
-    return (
-        <OrderContext.Provider value = {{state,handleFunction}}>
-            {props.children}
-        </OrderContext.Provider>
-    )
-}
+  // Table Pagination
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  let state = {
+    showModal,
+    setShowModal,
+    open,
+    setOpen,
+    search,
+    setSearch,
+    order,
+    setOrder,
+    orderBy,
+    setOrderBy,
+    page,
+    setPage,
+    dataPending,
+    setDataPending,
+    dataProducts,
+    setDataProducts,
+    fetchStatus,
+    setFetchStatus,
+    input,
+    setInput,
+    error,
+    setError,
+    success,
+    setSuccess,
+    errorName,
+    setErrorName,
+    errorSku,
+    setErrorSku,
+    rowsPerPage,
+    setRowsPerPage,
+    suppliers,
+    setSuppliers,
+  };
+
+  let handleFunction = {
+    handleClickOpen,
+    handleClose,
+    handleInput,
+    handleSelect,
+    handleSubmit,
+    handleConfirm,
+    handleDelete,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    handleRequestSort,
+    getComparator,
+    descendingComparator,
+    stableSort,
+  };
+
+  return <OrderContext.Provider value={{ state, handleFunction }}>{props.children}</OrderContext.Provider>;
+};

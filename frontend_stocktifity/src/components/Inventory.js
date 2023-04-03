@@ -58,28 +58,30 @@ const Inventory = () => {
     setErrorSku,
     rowsPerPage,
     setRowsPerPage,
+    suppliers,
+    setSuppliers,
+    edit,
+    setEdit,
   } = state;
 
-  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleEdit, handleDelete, filteredData, handleChangePage, handleChangeRowsPerPage, handleRequestSort, getComparator, descendingComparator, stableSort } = handleFunction;
-
-  // useEffect(() => {
-  //   if (fetchStatus === true) {
-  //     axios.get("http://localhost:5000/api/v1/products")
-  //     .then((res) => {
-  //         setData([...res.data])
-  //     })
-  //     .catch((error) => {
-  //         console.log(error)
-  //     })
-  //     setFetchStatus(false)
-  //   }
-  // }, [fetchStatus,setFetchStatus])
+  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleEdit, handleDelete, handleChangePage, handleChangeRowsPerPage, handleRequestSort, getComparator, descendingComparator, stableSort, handleSupplierSelect } =
+    handleFunction;
 
   useEffect(() => {
     let fetchData = async () => {
       try {
         let result = await axios.get("http://localhost:5000/api/v1/products");
         setData(result.data);
+        console.log(result.data)
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    let fetchSuppliers = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/v1/suppliers");
+        setSuppliers(response.data);
       } catch (error) {
         console.log(error);
       }
@@ -87,6 +89,7 @@ const Inventory = () => {
 
     if (fetchStatus) {
       fetchData();
+      fetchSuppliers();
       setFetchStatus(false);
     }
   }, [fetchStatus, setFetchStatus]);
@@ -96,9 +99,12 @@ const Inventory = () => {
     { id: "name", label: "Name" },
     { id: "quantity", label: "Quantity" },
     { id: "category", label: "Category" },
+    { id: "Supplier", label: "Supplier" },
     { id: "date", label: "Date" },
     { id: "action", label: "Action" },
   ];
+
+  const filteredData = data.filter((row) => row.sku.toLowerCase().includes(search.toLowerCase()) || row.name.toLowerCase().includes(search.toLowerCase()) || row.Supplier?.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <>
@@ -130,7 +136,8 @@ const Inventory = () => {
                     type="search"
                     id="search"
                     name="search"
-                    className="w-1/2 border border-black rounded-lg ml-2 shadow-none outline-none focus:outline-none hover:outline-none"
+                    placeholder="Search..."
+                    className="w-1/2 border border-black rounded-lg ml-2 pl-2 shadow-none outline-none focus:outline-none hover:outline-none"
                   />
                   {/* <span className="px-2"><SearchSharpIcon/></span> */}
                 </div>
@@ -146,63 +153,6 @@ const Inventory = () => {
 
               <div className="py-2 sm:px-6 lg:px-8">
                 <div className="overflow-auto">
-                  {/* <table className="min-w-full table-fixed border-collapse border border-slate-300">
-                    <thead className="bg-white border-b">
-                      <tr>
-                        <th onClick={() => sorting("sku")} scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                          Sku
-                        </th>
-                        <th scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left whitespace-nowrap">
-                          Name
-                        </th>
-                        <th scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                          Quantity
-                        </th>
-                        <th scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                          Category
-                        </th>
-                        <th scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                          Date
-                        </th>
-                        <th scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                          Action
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data !== null &&
-                        data
-                          .filter((e) => {
-                            return search.toLowerCase() === "" ? e : e.sku.toLowerCase().includes(search) + e.name.toLowerCase().includes(search);
-                          })
-                          .map((item) => {
-                            return (
-                              <React.Fragment key={item._id}>
-                                <tr className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100">
-                                  <td className="border border-slate-300 px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.sku}</td>
-                                  <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">{item.name}</td>
-                                  <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">{item.quantity}</td>
-                                  <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">{item.category}</td>
-                                  <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">
-                                    <span className="font-bold">Created : </span>
-                                    {moment(item.createdAt).format("DD MMMM YYYY, LT")} <br></br>
-                                    <span className="font-bold">Updated : </span>
-                                    {moment(item.updatedAt).format("DD MMMM YYYY, LT")}
-                                  </td>
-                                  <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                                    <button onClick={() => handleEdit(item._id)} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
-                                      <FiEdit size={21} color={"white"} className="mx-auto" />
-                                    </button>
-                                    <button onClick={() => handleDelete(item._id)} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
-                                      <TiCancel size={21} color={"white"} className="mx-auto" />
-                                    </button>
-                                  </td>
-                                </tr>
-                              </React.Fragment>
-                            );
-                          })}
-                    </tbody>
-                  </table> */}
                   <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 650 }}>
                       <TableHead>
@@ -225,6 +175,7 @@ const Inventory = () => {
                               <TableCell>{row.name}</TableCell>
                               <TableCell>{row.quantity}</TableCell>
                               <TableCell>{row.category}</TableCell>
+                              <TableCell>{row.Supplier?.name}</TableCell>
                               <TableCell>
                                 <span className="font-bold">Created : </span>
                                 {moment(row.createdAt).format("DD MMMM YYYY, LT")} <br></br>
@@ -245,23 +196,6 @@ const Inventory = () => {
                     </Table>
                   </TableContainer>
                 </div>
-                {/* <div className="flex flex-col items-center w-full px-4 py-2 space-y-2 text-sm text-gray-500 sm:justify-between sm:space-y-0 sm:flex-row">
-                  <p className="flex">
-                    Showing&nbsp;<span className="font-bold"> 1 to 5 </span>&nbsp;of 5 entries
-                  </p>
-                  <div className="flex items-center justify-between space-x-2">
-                    <a href="#" className="hover:text-gray-600">
-                      Previous
-                    </a>
-                    <div className="flex flex-row space-x-1">
-                    <div className="flex px-2 py-px text-white bg-blue-400 border border-blue-400">1</div>
-                    <div className="flex px-2 py-px border border-blue-400 hover:bg-blue-400 hover:text-white">2</div>
-                    </div>
-                    <a href="#" className="hover:text-gray-600">
-                    Next
-                    </a>
-                    </div>
-                  </div> */}
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 15]}
                   component="div"
@@ -332,7 +266,7 @@ const Inventory = () => {
                           onChange={handleInput}
                           value={input.quantity}
                           min={1}
-                          max={1000}
+                          max={100000}
                           type="number"
                           id="quantity"
                           name="quantity"
@@ -381,6 +315,29 @@ const Inventory = () => {
                           className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
                           required
                         ></input>
+                      </div>
+                    </div>
+                    <div className="w-full sm:flex items-center">
+                      <div className="w-full sm:w-1/3">
+                        <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Supplier</label>
+                      </div>
+                      <div className="w-full sm:w-1/2 pl-4 pr-4">
+                        <select
+                          onChange={handleInput}
+                          value={input.Supplier?.name}
+                          id="Supplier"
+                          name="Supplier"
+                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
+                          required={!edit}
+                          disabled={edit}
+                        >
+                          <option value="">-- Select Supplier --</option>
+                          {suppliers.map((Supplier) => (
+                            <option key={Supplier.id} value={Supplier.name}>
+                              {Supplier.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                     <div className="w-full sm:flex items-center pt-6 pb-6">
