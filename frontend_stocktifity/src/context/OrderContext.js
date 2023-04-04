@@ -107,9 +107,9 @@ export const OrderProvider = (props) => {
     } catch (error) {
       if (error.response) {
         setError(error.response.data);
-        setTimeout(() => {
-          setError(null);
-        }, 2000);
+        // setTimeout(() => {
+        //   setError(null);
+        // }, 2000);
       }
     }
   };

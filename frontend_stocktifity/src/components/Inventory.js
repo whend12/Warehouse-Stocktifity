@@ -265,7 +265,7 @@ const Inventory = () => {
                         <input
                           onChange={handleInput}
                           value={input.quantity}
-                          min={1}
+
                           max={100000}
                           type="number"
                           id="quantity"

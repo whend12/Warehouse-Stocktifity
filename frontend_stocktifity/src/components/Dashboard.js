@@ -99,7 +99,7 @@ const Dashboard = () => {
     { id: "quantity", label: "Quantity" },
     { id: "category", label: "Category" },
     { id: "Supplier", label: "Supplier" },
-    { id: "createdAt", label: "Date" },
+    { id: "upadtedAt", label: "Date" },
   ];
 
   useEffect(() => {
@@ -254,8 +254,8 @@ const Dashboard = () => {
                               <TableCell>{row.category}</TableCell>
                               <TableCell>{row.Supplier?.name}</TableCell>
                               <TableCell>
-                                <span className="font-bold">Created : </span>
-                                {moment(row.createdAt).format("DD MMMM YYYY, LT")} <br></br>
+                                <span className="font-bold">Updated : </span>
+                                {moment(row.updatedAt).format("DD MMMM YYYY, LT")} <br></br>
                               </TableCell>
                             </TableRow>
                           ))}

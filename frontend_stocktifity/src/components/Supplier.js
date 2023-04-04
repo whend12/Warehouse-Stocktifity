@@ -1,47 +1,102 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 
-// Import Footer
+// Import File
 import Footer from "../pages/Footer";
+import { SupplierContext } from "../context/SupplierContext";
 
 // Import Icon
-
 import { AiFillPlusSquare } from "react-icons/ai";
 import { FiEdit } from "react-icons/fi";
 import { TiCancel } from "react-icons/ti";
 import { ImCancelCircle } from "react-icons/im";
+import SearchSharpIcon from "@mui/icons-material/SearchSharp";
 
 // Import Dialog
+// import Dialog from "@mui/material/Dialog";
+// import { Alert } from "@mui/material";
+// import AlertTitle from "@mui/material/AlertTitle";
+// import DialogActions from "@mui/material/DialogActions";
+// import Slide from "@mui/material/Slide";
 
-import Dialog from "@mui/material/Dialog";
+// Import from MUI
 import { Alert } from "@mui/material";
-import AlertTitle from "@mui/material/AlertTitle";
-import DialogActions from "@mui/material/DialogActions";
-import Slide from "@mui/material/Slide";
-import { SupplierContext } from "../context/SupplierContext";
+import { TablePagination } from "@mui/material";
+import TableContainer from "@mui/material/TableContainer";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableSortLabel from "@mui/material/TableSortLabel";
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+// const Transition = React.forwardRef(function Transition(props, ref) {
+//   return <Slide direction="up" ref={ref} {...props} />;
+// });
 
 const Supplier = () => {
   const { state, handleFunction } = useContext(SupplierContext);
 
-  let { showModal, setShowModal, open, setOpen, data, setData, fetchStatus, setFetchStatus, currentId, setCurrentId, input, setInput, errorName, setErrorName, errorEmail, setErrorEmail, errorPhone, setErrorPhone } = state;
+  let {
+    showModal,
+    setShowModal,
+    open,
+    setOpen,
+    search,
+    setSearch,
+    order,
+    setOrder,
+    orderBy,
+    setOrderBy,
+    page,
+    setPage,
+    rowsPerPage,
+    setRowsPerPage,
+    data,
+    setData,
+    fetchStatus,
+    setFetchStatus,
+    input,
+    setInput,
+    success,
+    setSuccess,
+    errorName,
+    setErrorName,
+    errorEmail,
+    setErrorEmail,
+    errorPhone,
+    setErrorPhone,
+  } = state;
 
-  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleEdit, handleDelete } = handleFunction;
+  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleEdit, handleDelete, handleRequestSort, getComparator, descendingComparator, stableSort, handleChangePage, handleChangeRowsPerPage } = handleFunction;
 
   useEffect(() => {
-    if (fetchStatus === true) {
-      axios
-        .get("http://localhost:5000/api/v1/suppliers")
-        .then((res) => {
-          setData([...res.data]);
-        })
-        .catch((error) => {});
+    let fetchData = async () => {
+      try {
+        let result = await axios.get("http://localhost:5000/api/v1/suppliers");
+        setData(result.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (fetchStatus) {
+      fetchData();
       setFetchStatus(false);
     }
   }, [fetchStatus, setFetchStatus]);
+
+  const columns = [
+    { id: "no", label: "No" },
+    { id: "name", label: "Name" },
+    { id: "email", label: "Email" },
+    { id: "phone", label: "Phone" },
+    { id: "address", label: "Address" },
+    { id: "action", label: "Action" },
+  ];
+
+  const filteredData = data !== null ? data.filter((row) => (row.no && row.no.toLowerCase().includes(search.toLowerCase())) || (row.name && row.name.toLowerCase().includes(search.toLowerCase()))) : null;
 
   return (
     <>
@@ -58,19 +113,28 @@ const Supplier = () => {
 
         <div className="flex">
           <div className="flex justify-center w-full min-h-[634px] bg-[#474E68] p-10">
-            <div className="w-full sm:-mx-6 lg:-mx-8 bg-[#ffffff] rounded-lg">
+            <div className="w-full sm:-mx-6 lg:-mx-8 bg-[#ffffff] rounded-lg shadow-lg">
               {/* Subtitle */}
 
-              <h2 className="font-bold mt-2 ml-8">List Supplier</h2>
+              <h2 className="font-bold mt-4 ml-8 text-xl text-center uppercase">Supplier</h2>
               <div className="flex justify-between items-center">
                 <div className="search ml-8">
                   <label htmlFor="search" className="text-black">
                     Search:
                   </label>
-                  <input type="search" id="search" name="search" className="w-1/2 border border-black ml-2 shadow-none outline-none focus:outline-none hover:outline-none" />
+                  <input
+                    onChange={(e) => setSearch(e.target.value)}
+                    value={search}
+                    type="search"
+                    id="search"
+                    name="search"
+                    placeholder="Search..."
+                    className="w-1/2 border border-black rounded-lg ml-2 pl-2 shadow-none outline-none focus:outline-none hover:outline-none"
+                  />
+                  {/* <span className="px-2"><SearchSharpIcon/></span> */}
                 </div>
                 <div className="btn-create">
-                  <button onClick={() => setShowModal(true)} className="flex items-center w-[6rem] bg-[#03C988] text-white mr-8 p-1 rounded hover:bg-[#03C4A1] focus:outline-none">
+                  <button onClick={() => setShowModal(true)} className="flex items-center w-[6rem] bg-[#03C988] text-white mr-8 p-1 rounded shadow-xl hover:bg-[#03C4A1] focus:outline-none">
                     <AiFillPlusSquare size={21} color={"white"} className="mr-2" />
                     Create
                   </button>
@@ -79,72 +143,54 @@ const Supplier = () => {
 
               {/* Table Supplier */}
 
-              <div className="py-2 overflow-auto sm:px-6 lg:px-8">
-                <table className="min-w-full table-fixed border-collapse border border-slate-300">
-                  <thead className="bg-white border-b">
-                    <tr>
-                      <th scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                        No
-                      </th>
-                      <th scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left whitespace-nowrap">
-                        Name
-                      </th>
-                      <th scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                        Email
-                      </th>
-                      <th scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                        Phone
-                      </th>
-                      <th scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-left">
-                        Address
-                      </th>
-                      <th scope="col" className="border border-slate-300 text-sm font-medium text-gray-900 px-6 py-4 text-center">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data !== null &&
-                      data.map((item, index) => {
-                        return (
-                          <React.Fragment key={item._id}>
-                            <tr className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100">
-                              <td className="border border-slate-300 px-6 py-4 whitespace-nowrap text-sm text-center font-medium text-gray-900">{index + 1}</td>
-                              <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">{item.name}</td>
-                              <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">{item.email}</td>
-                              <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">{item.phone}</td>
-                              <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4">{item.address}</td>
-                              <td className="border border-slate-300 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                                <button onClick={() => handleEdit(item._id)} value={item._id} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
+              <div className="py-2 sm:px-6 lg:px-8">
+                <div className="overflow-auto">
+                  <TableContainer component={Paper}>
+                    <Table sx={{ minWidth: 650 }}>
+                      <TableHead>
+                        <TableRow>
+                          {columns.map((column) => (
+                            <TableCell key={column._id} sortDirection={orderBy === column.id ? order : false}>
+                              <TableSortLabel hideSortIcon direction={orderBy === column.id ? order : "asc"} onClick={() => handleRequestSort(column.id)}>
+                                <span className="font-bold">{column.label}</span>
+                              </TableSortLabel>
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {filteredData && stableSort(filteredData, getComparator(order, orderBy))
+                          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                          .map((row, index) => (
+                            <TableRow key={row.id}>
+                              <TableCell>{index + 1}</TableCell>
+                              <TableCell>{row.name}</TableCell>
+                              <TableCell>{row.email}</TableCell>
+                              <TableCell>{row.phone}</TableCell>
+                              <TableCell>{row.address}</TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                <button onClick={() => handleEdit(row._id)} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
                                   <FiEdit size={21} color={"white"} className="mx-auto" />
                                 </button>
-                                <button onClick={() => handleDelete(item._id)} value={item._id} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
+                                <button onClick={() => handleDelete(row._id)} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
                                   <TiCancel size={21} color={"white"} className="mx-auto" />
                                 </button>
-                              </td>
-                            </tr>
-                          </React.Fragment>
-                        );
-                      })}
-                  </tbody>
-                </table>
-              </div>
-              <div className="flex flex-col items-center w-full px-4 py-2 space-y-2 text-sm text-gray-500 sm:justify-between sm:space-y-0 sm:flex-row">
-                <p className="flex">
-                  Showing&nbsp;<span className="font-bold"> 1 to 5 </span>&nbsp;of 5 entries
-                </p>
-                <div className="flex items-center justify-between space-x-2">
-                  <a href="#" className="hover:text-gray-600">
-                    Previous
-                  </a>
-                  <div className="flex flex-row space-x-1">
-                    <div className="flex px-2 py-px text-white bg-blue-400 border border-blue-400">1</div>
-                    <div className="flex px-2 py-px border border-blue-400 hover:bg-blue-400 hover:text-white">2</div>
-                  </div>
-                  <a href="#" className="hover:text-gray-600">
-                    Next
-                  </a>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </div>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 15]}
+                  component="div"
+                  count={data ? data.length : 0}
+                  rowsPerPage={rowsPerPage}
+                  page={Math.max(0, Math.min(page, Math.ceil(data ? data.length : 0 / rowsPerPage) - 1))}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
               </div>
             </div>
           </div>
@@ -280,7 +326,7 @@ const Supplier = () => {
 
       {/* Dialog Cancel */}
 
-      <Dialog open={open} TransitionComponent={Transition} keepMounted onClose={handleClose} aria-describedby="alert-dialog-slide-description">
+      {/* <Dialog open={open} TransitionComponent={Transition} keepMounted onClose={handleClose} aria-describedby="alert-dialog-slide-description">
         <Alert severity="warning">
           <AlertTitle>Warning</AlertTitle>
           <strong>Are you sure you want to delete?</strong>
@@ -293,7 +339,7 @@ const Supplier = () => {
             No
           </button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 };

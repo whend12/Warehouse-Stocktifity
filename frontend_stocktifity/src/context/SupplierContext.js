@@ -7,11 +7,13 @@ export const SupplierContext = createContext();
 export const SupplierProvider = (props) => {
   const [showModal, setShowModal] = useState(false);
   const [open, setOpen] = useState(false);
-  const [page, setPage] = useState(1); // Table Pagination
   const [data, setData] = useState(null); // fetching data
   const [fetchStatus, setFetchStatus] = useState(true); // indikator
   const [search, setSearch] = useState(""); // Search
   const [currentId, setCurrentId] = useState(-1);
+
+  // Handle Success
+  const [success, setSuccess] = useState("");
 
   // handleError
   const [errorName, setErrorName] = useState("");
@@ -26,21 +28,21 @@ export const SupplierProvider = (props) => {
     setOpen(false);
   };
 
-  // sort table data
-  const [order, setOrder] = useState("ASC");
-  const sorting = (col) => {
-    if (order === "ASC") {
-      const sorted = [...data].sort((a, b) => (a[col].toLowerCase() > b[col].toLowerCase() ? 1 : -1));
-      setData(sorted);
-      setOrder("DSC");
-    }
+  // // sort table data
+  // const [order, setOrder] = useState("ASC");
+  // const sorting = (col) => {
+  //   if (order === "ASC") {
+  //     const sorted = [...data].sort((a, b) => (a[col].toLowerCase() > b[col].toLowerCase() ? 1 : -1));
+  //     setData(sorted);
+  //     setOrder("DSC");
+  //   }
 
-    if (order === "DSC") {
-      const sorted = [...data].sort((a, b) => (a[col].toLowerCase() < b[col].toLowerCase() ? 1 : -1));
-      setData(sorted);
-      setOrder("ASC");
-    }
-  };
+  //   if (order === "DSC") {
+  //     const sorted = [...data].sort((a, b) => (a[col].toLowerCase() < b[col].toLowerCase() ? 1 : -1));
+  //     setData(sorted);
+  //     setOrder("ASC");
+  //   }
+  // };
 
   // Handling Input
   const [input, setInput] = useState({
@@ -67,14 +69,13 @@ export const SupplierProvider = (props) => {
       if (currentId === -1) {
         // Create Data
         const result = await axios.post("http://localhost:5000/api/v1/suppliers", { name, email, phone, address });
-        window.location.reload();
         setFetchStatus(true);
-        swal(result.data.message);
+        setSuccess(result.data.message);
       } else {
         // Update Data
         const result = await axios.put(`http://localhost:5000/api/v1/suppliers/${currentId}`, { name, email, phone, address });
         setFetchStatus(true);
-        alert(result.data.message);
+        setSuccess(result.data.message);
       }
 
       setInput({
@@ -132,31 +133,52 @@ export const SupplierProvider = (props) => {
     } catch {}
   };
 
-  // const handleDelete = async (event) => {
-  //   try {
-  //     let skuData = String(event.target.value)
-  //     axios.delete(`http://localhost:5000/api/v1/suppliers/${skuData}`)
-  //     swal({
-  //       title: 'Are you sure?',
-  //       text: "You want to delete this item? this process cannot be undone",
-  //       icon: 'warning',
-  //       dangerMode: true,
-  //       buttons: true,
-  //     }).then((willDelete) => {
-  //       if (willDelete) {
-  //         window.location.reload()
-  //         setFetchStatus(true)
-  //         swal("Item Deleted Successfully", {
-  //           icon: "success",
-  //         })
-  //     } else {
+  // Sort table data
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("sku");
 
-  //     }
-  //   })
-  //   } catch {
-  //     console.log("error")
-  //   }
-  // }
+  const handleRequestSort = (property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
+  const getComparator = (order, orderBy) => {
+    return order === "desc" ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
+  };
+
+  const descendingComparator = (a, b, orderBy) => {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  };
+
+  const stableSort = (array, comparator) => {
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+      const order = comparator(a[0], b[0]);
+      if (order !== 0) return order;
+      return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+  };
+
+  // Table Pagination
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   let state = {
     showModal,
@@ -167,14 +189,20 @@ export const SupplierProvider = (props) => {
     setSearch,
     order,
     setOrder,
+    orderBy,
+    setOrderBy,
     page,
     setPage,
+    rowsPerPage,
+    setRowsPerPage,
     data,
     setData,
     fetchStatus,
     setFetchStatus,
     input,
     setInput,
+    success,
+    setSuccess,
     errorName,
     setErrorName,
     errorEmail,
@@ -186,11 +214,16 @@ export const SupplierProvider = (props) => {
   let handleFunction = {
     handleClickOpen,
     handleClose,
-    sorting,
     handleInput,
     handleSubmit,
     handleEdit,
     handleDelete,
+    handleRequestSort,
+    getComparator,
+    descendingComparator,
+    stableSort,
+    handleChangePage,
+    handleChangeRowsPerPage,
   };
 
   return <SupplierContext.Provider value={{ state, handleFunction }}>{props.children}</SupplierContext.Provider>;
