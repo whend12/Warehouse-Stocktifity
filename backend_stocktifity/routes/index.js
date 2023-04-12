@@ -20,6 +20,7 @@ import {
 import {
     createPendingProduct,
     getAllPendingProducts,
+    deletePendingProduct,
     inbound,
     outbond
 } from '../controllers/pendingProductController.js'
@@ -62,6 +63,9 @@ router.route('/products/search/:name')
 router.route('/pending')
     .get(getAllPendingProducts)
     .post(createPendingProduct)
+
+router.route('/pending/:id')
+    .delete(deletePendingProduct)
 
 // inbound product (Product akan nambah atau buat product baru jika di confirm)
 router.route('/inbound/:id')

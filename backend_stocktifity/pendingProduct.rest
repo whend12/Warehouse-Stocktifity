@@ -28,3 +28,5 @@ PUT http://localhost:5000/api/v1/inbound/64131686cc688ab16a2bddb4
 //// end-point untuk outbound status pending
 PUT http://localhost:5000/api/v1/outbond/6412d588b6209bcac8cafb15
 
+###
+DELETE http://localhost:5000/api/v1/pending/641c0ff507a81bd0cc349ea9

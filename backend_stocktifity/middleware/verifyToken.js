@@ -9,4 +9,6 @@ export const verifyToken = (req, res, next) => {
         req.email = decoded.email;
         next();
     })
+    res.json({ accessToken: token })
+    next();
 }
