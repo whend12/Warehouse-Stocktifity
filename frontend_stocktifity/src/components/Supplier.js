@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import jwt_decode from "jwt-decode";
 import axios from "axios";
 
 // Import File
@@ -70,6 +72,57 @@ const Supplier = () => {
   } = state;
 
   let { handleClickOpen, handleClose, handleInput, handleSubmit, handleEdit, handleDelete, handleRequestSort, getComparator, descendingComparator, stableSort, handleChangePage, handleChangeRowsPerPage } = handleFunction;
+
+  const [name, setName] = useState("");
+  const [token, setToken] = useState("");
+  const [expire, setExpire] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    refreshToken();
+  }, []);
+
+  const refreshToken = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log(token);
+      const response = await axios.get("http://localhost:5000/api/v1/users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setToken(response.data.accessToken);
+      const decoded = jwt_decode(response.data.accessToken);
+      setName(decoded.name);
+      setExpire(decoded.exp);
+      console.log(decoded);
+    } catch (error) {
+      console.log(error);
+      if (error.response) {
+        navigate("/Login");
+      }
+    }
+  };
+
+  const axiosJWT = axios.create();
+
+  axiosJWT.interceptors.request.use(
+    async (config) => {
+      const currentDate = new Date();
+      if (expire * 1000 < currentDate.getTime()) {
+        const response = await axios.get("http://localhost:5000/api/v1/users");
+        config.headers.Authorization = `Bearer ${response.data.accessToken}`;
+        setToken(response.data.accessToken);
+        const decoded = jwt_decode(response.data.accessToken);
+        setName(decoded.name);
+        setExpire(decoded.exp);
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
   useEffect(() => {
     let fetchData = async () => {
@@ -159,25 +212,26 @@ const Supplier = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {filteredData && stableSort(filteredData, getComparator(order, orderBy))
-                          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                          .map((row, index) => (
-                            <TableRow key={row.id}>
-                              <TableCell>{index + 1}</TableCell>
-                              <TableCell>{row.name}</TableCell>
-                              <TableCell>{row.email}</TableCell>
-                              <TableCell>{row.phone}</TableCell>
-                              <TableCell>{row.address}</TableCell>
-                              <TableCell className="whitespace-nowrap">
-                                <button onClick={() => handleEdit(row._id)} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
-                                  <FiEdit size={21} color={"white"} className="mx-auto" />
-                                </button>
-                                <button onClick={() => handleDelete(row._id)} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
-                                  <TiCancel size={21} color={"white"} className="mx-auto" />
-                                </button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
+                        {filteredData &&
+                          stableSort(filteredData, getComparator(order, orderBy))
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row, index) => (
+                              <TableRow key={row.id}>
+                                <TableCell>{index + 1}</TableCell>
+                                <TableCell>{row.name}</TableCell>
+                                <TableCell>{row.email}</TableCell>
+                                <TableCell>{row.phone}</TableCell>
+                                <TableCell>{row.address}</TableCell>
+                                <TableCell className="whitespace-nowrap">
+                                  <button onClick={() => handleEdit(row._id)} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
+                                    <FiEdit size={21} color={"white"} className="mx-auto" />
+                                  </button>
+                                  <button onClick={() => handleDelete(row._id)} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
+                                    <TiCancel size={21} color={"white"} className="mx-auto" />
+                                  </button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
                       </TableBody>
                     </Table>
                   </TableContainer>

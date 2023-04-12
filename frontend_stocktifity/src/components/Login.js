@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import logo from "../assets/img/logo.png";
 import "./Login.css";
@@ -10,6 +10,7 @@ const Login = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [success, setSuccess] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorEmail, setErrorEmail] = useState("");
@@ -22,9 +23,14 @@ const Login = () => {
     event.preventDefault();
     try {
       const response = await axios.post("http://localhost:5000/api/v1/login", { email, password });
-      localStorage.setItem("token", response.data.token);
-      alert("Login success");
-      navigate("/Dashboard");
+      localStorage.setItem("token", response.data.accessToken);
+      setSuccess("Login Success");
+      setTimeout(() => {
+        setSuccess(null);
+      }, 2000);
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
     } catch (error) {
       if (error.response) {
         const errorMessage = error.response.data;
@@ -50,6 +56,7 @@ const Login = () => {
     <>
       <div className="container-fluid flex">
         <div className="side-left flex flex-col justify-center bg-[#3282B8] text-white min-h-[560px] h-screen w-[60%]">
+          <div className="absolute top-5 right-5">{success && <Alert severity="success">{success}</Alert>}</div>
           <div className="side-left-content h-screen flex flex-col p-20 justify-center">
             <h1 className="text-3xl font-bold mb-4 uppercase">warehouse stocktifity</h1>
             <h2 className="text-md font-bold mb-4">Warehouse system</h2>

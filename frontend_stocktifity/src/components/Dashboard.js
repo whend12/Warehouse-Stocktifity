@@ -34,21 +34,48 @@ const Dashboard = () => {
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/v1/users");
+      const token = localStorage.getItem("token");
+      console.log(token);
+      const response = await axios.get("http://localhost:5000/api/v1/users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
+      setName(decoded.name);
       setExpire(decoded.exp);
       console.log(decoded);
     } catch (error) {
       console.log(error);
       if (error.response) {
-        // navigate("/Login")
+        navigate("/Login")
       }
     }
   };
 
+  const axiosJWT = axios.create();
+
+  axiosJWT.interceptors.request.use(
+    async (config) => {
+      const currentDate = new Date();
+      if (expire * 1000 < currentDate.getTime()) {
+        const response = await axios.get("http://localhost:5000/api/v1/users");
+        config.headers.Authorization = `Bearer ${response.data.accessToken}`;
+        setToken(response.data.accessToken);
+        const decoded = jwt_decode(response.data.accessToken);
+        setName(decoded.name);
+        setExpire(decoded.exp);
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
+
   const getUsers = async () => {
-    const response = await axios.get("http://localhost:5000/api/v1/users", {
+    const response = await axiosJWT.get("http://localhost:5000/api/v1/users", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -107,7 +134,6 @@ const Dashboard = () => {
       try {
         let result = await axios.get("http://localhost:5000/api/v1/outbound-history");
         setDataOutbound(result.data);
-        console.log(result.data);
       } catch (error) {
         console.log(error.message);
       }
@@ -190,11 +216,15 @@ const Dashboard = () => {
 
   // Search Inbound
   const [searchInbound, setSearchInbound] = useState("");
-  const filteredDataInbound = dataInbound.filter((row) => row.sku.toLowerCase().includes(searchInbound.toLowerCase()) || row.name.toLowerCase().includes(searchInbound.toLowerCase()) || row.Supplier?.name.toLowerCase().includes(searchInbound.toLowerCase()));
+  const filteredDataInbound = dataInbound.filter(
+    (row) => row.sku.toLowerCase().includes(searchInbound.toLowerCase()) || row.name.toLowerCase().includes(searchInbound.toLowerCase()) || row.Supplier?.name.toLowerCase().includes(searchInbound.toLowerCase())
+  );
 
   // Search Outbound
   const [searchOutbound, setSearchOutbound] = useState("");
-  const filteredDataOutbound = dataOutbound.filter((row) => row.product.sku.toLowerCase().includes(searchOutbound.toLowerCase()) || row.product.name.toLowerCase().includes(searchOutbound.toLowerCase()) || row.product.Supplier?.name.toLowerCase().includes(searchOutbound.toLowerCase()));
+  const filteredDataOutbound = dataOutbound.filter(
+    (row) => row.product.sku.toLowerCase().includes(searchOutbound.toLowerCase()) || row.product.name.toLowerCase().includes(searchOutbound.toLowerCase()) || row.product.Supplier?.name.toLowerCase().includes(searchOutbound.toLowerCase())
+  );
 
   return (
     <>
@@ -211,6 +241,8 @@ const Dashboard = () => {
             <div className="mb-5 bg-[#ffffff] rounded-lg shadow-lg">
               {/* Subtitle */}
               <h2 className="font-bold mt-4 ml-8 text-xl uppercase">Inbound History</h2>
+              <h3>{name}</h3>
+              <button onClick={getUsers}>Get USers</button>
               <div className="flex items-center">
                 <div className="search ml-8">
                   <label htmlFor="search" className="text-black">
@@ -312,7 +344,8 @@ const Dashboard = () => {
                       </TableHead>
                       <TableBody>
                         {stableSort(dataOutbound && filteredDataOutbound, getComparator(order, orderBy))
-                          .slice(pageOutbound * rowsPerPageOutbound, pageOutbound * rowsPerPageOutbound + rowsPerPageOutbound).map((row) => (
+                          .slice(pageOutbound * rowsPerPageOutbound, pageOutbound * rowsPerPageOutbound + rowsPerPageOutbound)
+                          .map((row) => (
                             <TableRow key={row.id}>
                               <TableCell>{row.product.sku}</TableCell>
                               <TableCell>{row.product.name}</TableCell>

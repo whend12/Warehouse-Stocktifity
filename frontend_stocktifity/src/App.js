@@ -13,6 +13,7 @@ import Supplier from "./components/Supplier";
 import { InventoryProvider } from "./context/InventoryContext";
 import { SupplierProvider } from "./context/SupplierContext";
 import { OrderProvider } from "./context/OrderContext";
+import Header from "./pages/Header";
 
 const App = () => {
   return (
@@ -33,6 +34,7 @@ const App = () => {
                     <Route path="Inventory" element={<Inventory />} />
                     <Route path="Order" element={<Order />} />
                     <Route path="Supplier" element={<Supplier />} />
+                    <Route path="Header" element={<Header/>}/>
                   </>
                 }
               />
