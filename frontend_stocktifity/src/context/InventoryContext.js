@@ -142,8 +142,7 @@ export const InventoryProvider = (props) => {
           swal("Item Deleted Successfully", {
             icon: "success",
           });
-        } else {
-        }
+        } 
       });
     } catch {}
   };

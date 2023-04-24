@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import logo from "../assets/img/logo.png";
 import "./Login.css";
+
+// import from MUI
 import { Alert, Modal, Box, Typography } from "@mui/material";
 
 const Login = () => {

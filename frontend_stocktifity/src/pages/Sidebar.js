@@ -1,6 +1,7 @@
-import { NavLink, Navigate, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
+import swal from "sweetalert";
 
 // Import LOGO
 import logo from "../assets/img/logo.png";
@@ -18,10 +19,28 @@ import { IoMdLogOut } from "react-icons/io";
 
 const Sidebar = () => {
   const navigate = useNavigate();
+
   const Logout = async () => {
     try {
       await axios.delete("http://localhost:5000/api/v1/logout");
-      navigate("/Login");
+      swal({
+        title: "Are you sure?",
+        text: "You want to Logout?",
+        icon: "warning",
+        dangerMode: true,
+        buttons: true,
+      }).then((willLogout) => {
+        if (willLogout) {
+          localStorage.removeItem("token");
+          setTimeout(() => {
+            navigate("/Login");
+            swal("Logout Success", {
+              icon: "success",
+              buttons: false,
+            });
+          }, 2000);
+        }
+      });
     } catch (error) {
       console.log(error);
     }
@@ -50,13 +69,6 @@ const Sidebar = () => {
       name: "Supplier",
       icon: <GiForklift />,
     },
-    {
-      path: "/Login",
-      name: "Logout",
-      icon: <IoMdLogOut size={22} fill="#D61355" />,
-      style: { position: "absolute", bottom: "20px", width: `${isOpen ? "200px" : "62px"}` },
-      // onClick: Logout,
-    },
   ];
 
   return (
@@ -71,23 +83,27 @@ const Sidebar = () => {
             </div>
           </div>
           {menuItem.map((item, index) => (
-            <NavLink
-              to={item.path}
-              key={index}
-              // onClick={item.onClick}
-              style={item.style}
-              className="link flex items-center text-white pt-2.5 pb-2.5 pl-3.5 pr-3.5 gap-4 duration-500 hover:bg-[#EEEEEE] hover:text-[#000] active:bg-blue-500"
-            >
+            <NavLink to={item.path} key={index} onClick={item.onClick} style={item.style} className={`flex items-center text-white pt-2.5 pb-2.5 pl-3.5 pr-3.5 gap-4 duration-500 hover:bg-[#EEEEEE] hover:text-[#000] active:bg-blue-500`}>
               <div key={item.icon} className={`${!isOpen && "ml-2"} icon text-lg`}>
                 {item.icon}
               </div>
-              <div key={item.name} className={`${!isOpen && "hidden"} link-text text-sm`}>
+              <div key={item.name} className={`${!isOpen && "hidden"} text-sm`}>
                 {item.name}
               </div>
             </NavLink>
           ))}
+          <div
+            className="link flex items-center text-white pt-2.5 pb-2.5 pl-3.5 pr-3.5 gap-4 duration-500 hover:bg-[#EEEEEE] hover:text-[#000] active:bg-blue-500"
+            style={{ position: "absolute", bottom: "20px", width: `${isOpen ? "200px" : "62px"}` }}
+            onClick={Logout}
+          >
+            <div className="icon text-lg">
+              <IoMdLogOut size={22} fill="#D61355" />
+            </div>
+            <div className={`${!isOpen && "hidden"} link-text text-sm`}>{`Logout`}</div>
+          </div>
         </div>
-        <main className={`${isOpen ? "ml-[200px]" : "ml-[50px]"} w-screen duration-500`}>
+        <main className={`${isOpen ? "ml-[200px]" : "ml-[64px]"} w-screen duration-500`}>
           <Outlet />
         </main>
       </div>

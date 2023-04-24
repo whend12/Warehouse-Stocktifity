@@ -71,7 +71,6 @@ export const OrderProvider = (props) => {
         setFetchStatus(true);
         setSuccess("Success Create");
         setTimeout(() => {
-          window.location.reload();
           setSuccess(null);
         }, 3000);
       }
@@ -126,7 +125,6 @@ export const OrderProvider = (props) => {
         buttons: true,
       }).then((willDelete) => {
         if (willDelete) {
-          window.location.reload();
           setFetchStatus(true);
           swal("Item Deleted Successfully", {
             icon: "success",

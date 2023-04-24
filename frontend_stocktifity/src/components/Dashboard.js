@@ -241,8 +241,6 @@ const Dashboard = () => {
             <div className="mb-5 bg-[#ffffff] rounded-lg shadow-lg">
               {/* Subtitle */}
               <h2 className="font-bold mt-4 ml-8 text-xl uppercase">Inbound History</h2>
-              <h3>{name}</h3>
-              <button onClick={getUsers}>Get USers</button>
               <div className="flex items-center">
                 <div className="search ml-8">
                   <label htmlFor="search" className="text-black">
