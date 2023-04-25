@@ -32,12 +32,13 @@ const Sidebar = () => {
       }).then((willLogout) => {
         if (willLogout) {
           localStorage.removeItem("token");
+          swal("Logout Success", {
+            icon: "success",
+            buttons: false,
+            timer: 1000,
+          });
           setTimeout(() => {
             navigate("/Login");
-            swal("Logout Success", {
-              icon: "success",
-              buttons: false,
-            });
           }, 2000);
         }
       });
@@ -100,7 +101,7 @@ const Sidebar = () => {
             <div className="icon text-lg">
               <IoMdLogOut size={22} fill="#D61355" />
             </div>
-            <div className={`${!isOpen && "hidden"} link-text text-sm`}>{`Logout`}</div>
+            <div className={`${!isOpen && "hidden"} text-sm`}>{`Logout`}</div>
           </div>
         </div>
         <main className={`${isOpen ? "ml-[200px]" : "ml-[64px]"} w-screen duration-500`}>

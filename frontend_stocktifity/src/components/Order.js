@@ -97,7 +97,6 @@ const Order = () => {
   const refreshToken = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log(token);
       const response = await axios.get("http://localhost:5000/api/v1/users", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -105,9 +104,7 @@ const Order = () => {
       });
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
-      setName(decoded.name);
       setExpire(decoded.exp);
-      console.log(decoded);
     } catch (error) {
       console.log(error);
       if (error.response) {
@@ -217,7 +214,7 @@ const Order = () => {
           <div className="flex justify-center w-full min-h-[634px] bg-[#474E68] p-10">
             <div className="w-full sm:-mx-6 lg:-mx-8 bg-[#ffffff] rounded-lg shadow-lg">
               {/* Subtitle */}
-              <div className="fixed top-5 right-5">{success || (error && <Alert severity={success ? "success" : "error"}>{success || error}</Alert>)}</div>
+              <div className="fixed top-5 right-5">{success ? <Alert severity="success">{success}</Alert> : error && <Alert severity="error">{error}</Alert>}</div>
 
               <h2 className="font-bold mt-4 ml-8 text-xl text-center uppercase">Order</h2>
               <div className="flex justify-between items-center">
@@ -344,7 +341,7 @@ const Order = () => {
                           required
                         >
                           <option value="">-- Select sku --</option>
-                          {dataProducts.map((product) => (
+                          {dataProducts.sort((a, b) => a.sku.localeCompare(b.sku)).map((product) => (
                             <option key={product._id} value={product.sku}>
                               {product.sku}
                             </option>

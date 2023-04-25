@@ -85,7 +85,6 @@ const Supplier = () => {
   const refreshToken = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log(token);
       const response = await axios.get("http://localhost:5000/api/v1/users", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -93,9 +92,7 @@ const Supplier = () => {
       });
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
-      setName(decoded.name);
       setExpire(decoded.exp);
-      console.log(decoded);
     } catch (error) {
       console.log(error);
       if (error.response) {

@@ -52,7 +52,6 @@ export const OrderProvider = (props) => {
   const handleSelect = (event) => {
     let sku = event.target.value;
     let selectedProduct = dataProducts.find((product) => product.sku === sku);
-    console.log(selectedProduct.Supplier);
     setInput({...selectedProduct, quantity: 0});
   };
 
@@ -99,16 +98,17 @@ export const OrderProvider = (props) => {
     try {
       const response = await axios.put(`http://localhost:5000/api/v1/outbond/${_id}`);
       setFetchStatus(true);
-      setSuccess(response.data.message);
+      setSuccess(response.data);
       setTimeout(() => {
+        window.location.reload()
         setSuccess(null);
       }, 2000);
     } catch (error) {
       if (error.response) {
         setError(error.response.data);
-        // setTimeout(() => {
-        //   setError(null);
-        // }, 2000);
+        setTimeout(() => {
+          setError(null);
+        }, 2000);
       }
     }
   };
