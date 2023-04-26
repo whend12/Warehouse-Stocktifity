@@ -43,10 +43,11 @@ const Dashboard = () => {
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
+      navigate("/Dashboard");
     } catch (error) {
       console.log(error);
       if (error.response) {
-        navigate("/Login")
+        navigate("/Login");
       }
     }
   };
@@ -161,7 +162,7 @@ const Dashboard = () => {
     setOrderBy(property);
   };
 
-  const getComparator = (order, orderBy) => {
+  const getComparatorInbound = (order, orderBy) => {
     return order === "desc" ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
   };
 
@@ -271,7 +272,7 @@ const Dashboard = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {stableSort(dataInbound && filteredDataInbound, getComparator(order, orderBy))
+                        {stableSort(dataInbound && filteredDataInbound, getComparatorInbound(order, orderBy), (a, b) => moment(b.date) - moment(a.date))
                           .slice(pageInbound * rowsPerPageInbound, pageInbound * rowsPerPageInbound + rowsPerPageInbound)
                           .map((row) => (
                             <TableRow key={row.id}>
@@ -338,7 +339,7 @@ const Dashboard = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {stableSort(dataOutbound && filteredDataOutbound, getComparator(order, orderBy))
+                        {stableSort(dataOutbound && filteredDataOutbound, (a, b) => moment(b.date) - moment(a.date))
                           .slice(pageOutbound * rowsPerPageOutbound, pageOutbound * rowsPerPageOutbound + rowsPerPageOutbound)
                           .map((row) => (
                             <TableRow key={row.id}>
