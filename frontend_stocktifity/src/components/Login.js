@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, redirect } from "react-router-dom";
+import jwt_decode from "jwt-decode";
 
 import logo from "../assets/img/logo.png";
 import "./Login.css";
@@ -17,9 +18,53 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errorEmail, setErrorEmail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
+  
+  const [token, setToken] = useState("");
+  const [expire, setExpire] = useState("");
   const navigate = useNavigate();
 
-  const [show, setShow] = useState(true);
+  useEffect(() => {
+    refreshToken();
+  }, []);
+
+  const refreshToken = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:5000/api/v1/users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      navigate("/Dashboard")
+      setToken(response.data.accessToken);
+      const decoded = jwt_decode(response.data.accessToken);
+      setExpire(decoded.exp);
+    } catch (error) {
+      console.log(error);
+      if (error.response) {
+        navigate("/Login");
+      }
+    }
+  };
+
+  const axiosJWT = axios.create();
+
+  axiosJWT.interceptors.request.use(
+    async (config) => {
+      const currentDate = new Date();
+      if (expire * 1000 < currentDate.getTime()) {
+        const response = await axios.get("http://localhost:5000/api/v1/users");
+        config.headers.Authorization = `Bearer ${response.data.accessToken}`;
+        setToken(response.data.accessToken);
+        const decoded = jwt_decode(response.data.accessToken);
+        setExpire(decoded.exp);
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -27,12 +72,15 @@ const Login = () => {
       const response = await axios.post("http://localhost:5000/api/v1/login", { email, password });
       localStorage.setItem("token", response.data.accessToken);
       setSuccess("Login Success");
+
       setTimeout(() => {
         setSuccess(null);
       }, 2000);
+      
       setTimeout(() => {
         navigate("/");
       }, 3000);
+
     } catch (error) {
       if (error.response) {
         const errorMessage = error.response.data;
