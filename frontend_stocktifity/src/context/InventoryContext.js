@@ -76,7 +76,6 @@ export const InventoryProvider = (props) => {
         setFetchStatus(true);
         setSuccess(result.data.message);
         setTimeout(() => {
-          window.location.reload();
           setSuccess(null);
         }, 4000);
       } else {

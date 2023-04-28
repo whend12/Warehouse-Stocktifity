@@ -95,7 +95,7 @@ const Sidebar = () => {
           ))}
           <div
             className="link flex items-center text-white pt-2.5 pb-2.5 pl-3.5 pr-3.5 gap-4 duration-500 hover:bg-[#EEEEEE] hover:text-[#000] active:bg-blue-500"
-            style={{ position: "absolute", bottom: "20px", width: `${isOpen ? "200px" : "62px"}` }}
+            style={{ position: "absolute", bottom: "20px", width: `${isOpen ? "200px" : "62px"}`, cursor: "pointer" }}
             onClick={Logout}
           >
             <div className="icon text-lg">
