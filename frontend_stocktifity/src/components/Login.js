@@ -25,7 +25,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   // Loading Animation
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Refresh Token
   useEffect(() => {
@@ -50,7 +50,10 @@ const Login = () => {
     } catch (error) {
       console.log(error);
       if (error.response) {
-        navigate("/Login");
+        setTimeout(() => {
+          setLoading(true);
+          navigate("/Login");
+        }, 2000);
       }
     }
   };
@@ -112,10 +115,6 @@ const Login = () => {
   return (
     <>
       {loading ? (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-          <CircularProgress />
-        </div>
-      ) : (
         <div className="container-fluid flex">
           <div className="side-left flex flex-col justify-center bg-[#3282B8] text-white min-h-[560px] h-screen w-[60%]">
             <div className="absolute top-5 right-5">{success && <Alert severity="success">{success}</Alert>}</div>
@@ -195,6 +194,10 @@ const Login = () => {
               <p className="text-center p-5">Software Development Team</p>
             </footer>
           </div>
+        </div>
+      ) : (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+          <CircularProgress />
         </div>
       )}
     </>
