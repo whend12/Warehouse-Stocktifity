@@ -67,7 +67,6 @@ export const InventoryProvider = (props) => {
     let { name, quantity, sku, category, Supplier } = input;
 
     try {
-
       const supplierId = suppliers.find((supplier) => supplier.name === Supplier)?._id;
 
       if (currentId === -1) {
@@ -110,6 +109,18 @@ export const InventoryProvider = (props) => {
   // Handling Edit
   const [edit, setEdit] = useState(false);
 
+  const handleCreate = () => {
+    setShowModal(true);
+    setEdit(false);
+    setInput({
+      name: "",
+      quantity: "",
+      sku: "",
+      category: "",
+      Supplier: "",
+    });
+  };
+
   const handleEdit = async (_id) => {
     console.log(_id);
 
@@ -136,12 +147,11 @@ export const InventoryProvider = (props) => {
         buttons: true,
       }).then((willDelete) => {
         if (willDelete) {
-          window.location.reload();
           setFetchStatus(true);
           swal("Item Deleted Successfully", {
             icon: "success",
           });
-        } 
+        }
       });
     } catch {}
   };
@@ -218,6 +228,7 @@ export const InventoryProvider = (props) => {
     handleClose,
     handleInput,
     handleSubmit,
+    handleCreate,
     handleEdit,
     handleDelete,
     handleChangePage,

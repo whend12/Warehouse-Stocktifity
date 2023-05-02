@@ -35,7 +35,7 @@ const Sidebar = () => {
           swal("Logout Success", {
             icon: "success",
             buttons: false,
-            timer: 1000,
+            timer: 500,
           });
           setTimeout(() => {
             navigate("/Login");

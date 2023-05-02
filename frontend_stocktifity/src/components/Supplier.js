@@ -61,6 +61,8 @@ const Supplier = () => {
     setFetchStatus,
     input,
     setInput,
+    edit,
+    setEdit,
     success,
     setSuccess,
     errorName,
@@ -71,7 +73,7 @@ const Supplier = () => {
     setErrorPhone,
   } = state;
 
-  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleEdit, handleDelete, handleRequestSort, getComparator, descendingComparator, stableSort, handleChangePage, handleChangeRowsPerPage } = handleFunction;
+  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleCreate, handleEdit, handleDelete, handleRequestSort, getComparator, descendingComparator, stableSort, handleChangePage, handleChangeRowsPerPage } = handleFunction;
 
   const [name, setName] = useState("");
   const [token, setToken] = useState("");
@@ -184,7 +186,7 @@ const Supplier = () => {
                   {/* <span className="px-2"><SearchSharpIcon/></span> */}
                 </div>
                 <div className="btn-create">
-                  <button onClick={() => setShowModal(true)} className="flex items-center w-[6rem] bg-[#03C988] text-white mr-8 p-1 rounded shadow-xl hover:bg-[#03C4A1] focus:outline-none">
+                  <button onClick={handleCreate} className="flex items-center w-[6rem] bg-[#03C988] text-white mr-8 p-1 rounded shadow-xl hover:bg-[#03C4A1] focus:outline-none">
                     <AiFillPlusSquare size={21} color={"white"} className="mr-2" />
                     Create
                   </button>
@@ -284,7 +286,7 @@ const Supplier = () => {
                           id="name"
                           name="name"
                           placeholder="Input name"
-                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
+                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none capitalize"
                           required
                         ></input>
                       </div>
@@ -352,7 +354,7 @@ const Supplier = () => {
                           name="address"
                           id="address"
                           placeholder="Input address"
-                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
+                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none capitalize"
                           required
                         ></input>
                       </div>

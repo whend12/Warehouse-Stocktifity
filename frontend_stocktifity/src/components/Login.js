@@ -9,6 +9,7 @@ import "./Login.css";
 // import from MUI
 import { Alert, Modal, Box, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
 const Login = () => {
   const [open, setOpen] = useState(false);
@@ -42,19 +43,18 @@ const Login = () => {
       });
       setTimeout(() => {
         setLoading(true);
-        navigate("/Dashboard");
+        navigate("/");
       }, 2000);
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
     } catch (error) {
-      console.log(error);
-      if (error.response) {
-        setTimeout(() => {
-          setLoading(true);
-          navigate("/Login");
-        }, 2000);
-      }
+      setTimeout(() => {
+        setLoading(true);
+        navigate("/Login");
+      }, 2000);
+      // if (error.response) {
+      // }
     }
   };
 
@@ -108,6 +108,7 @@ const Login = () => {
     width: 400,
     bgcolor: "background.paper",
     border: "2px solid #000",
+    borderRadius: "5px",
     boxShadow: 24,
     p: 1,
   };
@@ -177,7 +178,9 @@ const Login = () => {
                     <Box sx={style}>
                       <Alert severity="info">Please Contact Admin</Alert>
                       <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        Whatsapp
+                        <div className="flex items-center ml-2">
+                          <WhatsAppIcon style={{ fill: "#25D366" }} /> <Link to={"https://api.whatsapp.com/send?phone=6281286882337"}>Danna Ilham</Link>
+                        </div>
                       </Typography>
                     </Box>
                   </Modal>

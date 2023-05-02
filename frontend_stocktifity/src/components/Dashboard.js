@@ -12,6 +12,7 @@ import { BsFillPersonFill } from "react-icons/bs";
 
 // Import from MUI
 import { Alert } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import { TablePagination } from "@mui/material";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
@@ -26,6 +27,9 @@ const Dashboard = () => {
   const [name, setName] = useState("");
   const [token, setToken] = useState("");
   const [expire, setExpire] = useState("");
+
+  // Loading Animation
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,7 +38,7 @@ const Dashboard = () => {
 
   const refreshToken = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token");      
       const response = await axios.get("http://localhost:5000/api/v1/users", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -43,7 +47,6 @@ const Dashboard = () => {
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
-      navigate("/Dashboard");
     } catch (error) {
       console.log(error);
       if (error.response) {
@@ -72,14 +75,14 @@ const Dashboard = () => {
     }
   );
 
-  const getUsers = async () => {
-    const response = await axiosJWT.get("http://localhost:5000/api/v1/users", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log(response.data);
-  };
+  // const getUsers = async () => {
+  //   const response = await axiosJWT.get("http://localhost:5000/api/v1/users", {
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   });
+  //   console.log(response.data);
+  // };
 
   const [dataInbound, setDataInbound] = useState([]);
   const [dataOutbound, setDataOutbound] = useState([]);
@@ -153,40 +156,74 @@ const Dashboard = () => {
   ];
 
   // Sort table data
-  const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("sku");
+  const [inboundOrder, inboundSetOrder] = useState("asc");
+  const [inboundOrderBy, inboundSetOrderBy] = useState("sku");
 
-  const handleRequestSort = (property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
+  const handleRequestSortInbound = (property) => {
+    const isAsc = inboundOrderBy === property && inboundOrder === "asc";
+    inboundSetOrder(isAsc ? "desc" : "asc");
+    inboundSetOrderBy(property);
   };
 
-  const getComparatorInbound = (order, orderBy) => {
-    return order === "desc" ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
+  const getComparatorInbound = (inboundOrder, inboundOrderBy) => {
+    return inboundOrder === "desc" ? (a, b) => descendingComparatorInbound(a, b, inboundOrderBy) : (a, b) => -descendingComparatorInbound(a, b, inboundOrderBy);
   };
 
-  const descendingComparator = (a, b, orderBy) => {
-    if (b[orderBy] < a[orderBy]) {
+  const descendingComparatorInbound = (a, b, inboundOrderBy) => {
+    if (b[inboundOrderBy] < a[inboundOrderBy]) {
       return -1;
     }
-    if (b[orderBy] > a[orderBy]) {
+    if (b[inboundOrderBy] > a[inboundOrderBy]) {
       return 1;
     }
     return 0;
   };
 
-  const stableSort = (array, comparator) => {
+  const stableSortInbound = (array, comparatorInbound) => {
     const stabilizedThis = array.map((el, index) => [el, index]);
     stabilizedThis.sort((a, b) => {
-      const order = comparator(a[0], b[0]);
+      const order = comparatorInbound(a[0], b[0]);
       if (order !== 0) return order;
       return a[1] - b[1];
     });
     return stabilizedThis.map((el) => el[0]);
   };
 
-  // Table Pagination Inbound
+  // Sort Table Data Outbound
+  const [outboundOrder, outboundSetOrder] = useState("asc");
+  const [outboundOrderBy, outboundSetOrderBy] = useState("sku");
+  
+  const handleRequestSortOutbound = (property) => {
+    const isAsc = outboundOrderBy === property && outboundOrder === "asc";
+    outboundSetOrder(isAsc ? "desc" : "asc");
+    outboundSetOrderBy(property);
+  };
+
+  const getComparatorOutbound = (outboundOrder, outboundOrderBy) => {
+    return outboundOrder === "desc" ? (a, b) => descendingComparatorOutbound(a, b, outboundOrderBy) : (a, b) => -descendingComparatorOutbound(a, b, outboundOrderBy);
+  };
+
+  const descendingComparatorOutbound = (a, b, outboundOrderBy) => {
+    if (b[outboundOrderBy] < a[outboundOrderBy]) {
+      return -1;
+    }
+    if (b[outboundOrderBy] > a[outboundOrderBy]) {
+      return 1;
+    }
+    return 0;
+  };
+
+  const stableSortOutbound = (array, comparatorOutbound) => {
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+      const order = comparatorOutbound(a[0], b[0]);
+      if (order !== 0) return order;
+      return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+  };
+
+  // Table Pagination outbound
   const [pageInbound, setPageInbound] = useState(0);
   const [rowsPerPageInbound, setRowsPerPageInbound] = useState(5);
 
@@ -226,6 +263,7 @@ const Dashboard = () => {
 
   return (
     <>
+     {loading ? (
       <div className="w-full">
         <header className="flex w-full bg-[#6B728E] border-b-2 p-4">
           <div className="flex w-full">
@@ -263,8 +301,8 @@ const Dashboard = () => {
                       <TableHead>
                         <TableRow>
                           {columnsInbound.map((column) => (
-                            <TableCell key={column._id} sortDirection={orderBy === column.id ? order : false}>
-                              <TableSortLabel hideSortIcon direction={orderBy === column.id ? order : "asc"} onClick={() => handleRequestSort(column.id)}>
+                            <TableCell key={column._id} sortDirection={inboundOrderBy === column.id ? inboundOrder : false}>
+                              <TableSortLabel hideSortIcon direction={inboundOrderBy === column.id ? inboundOrder : "asc"} onClick={() => handleRequestSortInbound(column.id)}>
                                 <span className="font-bold">{column.label}</span>
                               </TableSortLabel>
                             </TableCell>
@@ -272,7 +310,7 @@ const Dashboard = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {stableSort(dataInbound && filteredDataInbound, getComparatorInbound(order, orderBy), (a, b) => moment(b.date) - moment(a.date))
+                        {stableSortInbound(dataInbound && filteredDataInbound, getComparatorInbound(inboundOrder, inboundOrderBy), (a, b) => moment(b.date) - moment(a.date))
                           .slice(pageInbound * rowsPerPageInbound, pageInbound * rowsPerPageInbound + rowsPerPageInbound)
                           .map((row) => (
                             <TableRow key={row.id}>
@@ -329,9 +367,9 @@ const Dashboard = () => {
                     <Table sx={{ minWidth: 650 }}>
                       <TableHead>
                         <TableRow>
-                          {columnsOutbound.map((column) => (
-                            <TableCell key={column._id}>
-                              <TableSortLabel>
+                        {columnsOutbound.map((column) => (
+                            <TableCell key={column._id} sortDirection={outboundOrderBy === column.id ? outboundOrder : false}>
+                              <TableSortLabel hideSortIcon direction={outboundOrderBy === column.id ? outboundOrder : "asc"} onClick={() => handleRequestSortOutbound(column.id)}>
                                 <span className="font-bold">{column.label}</span>
                               </TableSortLabel>
                             </TableCell>
@@ -339,7 +377,7 @@ const Dashboard = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {stableSort(dataOutbound && filteredDataOutbound, (a, b) => moment(b.date) - moment(a.date))
+                        {stableSortOutbound(dataOutbound && filteredDataOutbound, getComparatorOutbound(outboundOrder, outboundOrderBy), (a, b) => moment(b.date) - moment(a.date))
                           .slice(pageOutbound * rowsPerPageOutbound, pageOutbound * rowsPerPageOutbound + rowsPerPageOutbound)
                           .map((row) => (
                             <TableRow key={row.id}>
@@ -373,6 +411,11 @@ const Dashboard = () => {
         </div>
         <Footer />
       </div>
+      ) : (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+          <CircularProgress />
+        </div>
+      )}
     </>
   );
 };

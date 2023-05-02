@@ -27,6 +27,7 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
+import { create } from "@mui/material/styles/createTransitions";
 
 const Inventory = () => {
   const { state, handleFunction } = useContext(InventoryContext);
@@ -66,7 +67,7 @@ const Inventory = () => {
     setEdit,
   } = state;
 
-  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleEdit, handleDelete, handleChangePage, handleChangeRowsPerPage, handleRequestSort, getComparator, descendingComparator, stableSort, handleSupplierSelect } =
+  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleCreate, handleEdit, handleDelete, handleChangePage, handleChangeRowsPerPage, handleRequestSort, getComparator, descendingComparator, stableSort, handleSupplierSelect } =
     handleFunction;
 
   const [name, setName] = useState("");
@@ -191,7 +192,7 @@ const Inventory = () => {
                   {/* <span className="px-2"><SearchSharpIcon/></span> */}
                 </div>
                 <div className="btn-create">
-                  <button onClick={() => setShowModal(true)} className="flex items-center w-[6rem] bg-[#03C988] text-white mr-8 p-1 rounded shadow-xl hover:bg-[#03C4A1] focus:outline-none">
+                  <button onClick={handleCreate} className="flex items-center w-[6rem] bg-[#03C988] text-white mr-8 p-1 rounded shadow-xl hover:bg-[#03C4A1] focus:outline-none">
                     <AiFillPlusSquare size={21} color={"white"} className="mr-2" />
                     Create
                   </button>
@@ -296,7 +297,7 @@ const Inventory = () => {
                           id="name"
                           name="name"
                           placeholder="Input name"
-                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
+                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none capitalize"
                           required
                         ></input>
                       </div>
@@ -375,7 +376,7 @@ const Inventory = () => {
                           value={input.Supplier?.name}
                           id="Supplier"
                           name="Supplier"
-                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
+                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none appearance-none"
                           required={!edit}
                           disabled={edit}
                         >
