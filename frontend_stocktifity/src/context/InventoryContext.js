@@ -101,6 +101,10 @@ export const InventoryProvider = (props) => {
         const errorMessage = error.response.data;
         setErrorName(errorMessage.messageName);
         setErrorSku(errorMessage.messageSku);
+        setTimeout(() => {
+          setErrorName(null);
+          setErrorSku(null);
+        }, 2000);
         console.log(error.response.data);
       }
     }

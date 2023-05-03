@@ -167,6 +167,7 @@ const Supplier = () => {
           <div className="flex justify-center w-full min-h-[634px] bg-[#474E68] p-10">
             <div className="w-full sm:-mx-6 lg:-mx-8 bg-[#ffffff] rounded-lg shadow-lg">
               {/* Subtitle */}
+              <div className="fixed top-5 right-5">{success && <Alert severity="success">{success}</Alert>}</div>
 
               <h2 className="font-bold mt-4 ml-8 text-xl text-center uppercase">Supplier</h2>
               <div className="flex justify-between items-center">
@@ -256,6 +257,7 @@ const Supplier = () => {
       {showModal ? (
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+          <div className="absolute top-5 right-5">{success && <Alert severity="success">{success}</Alert>}</div>
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
 

@@ -160,7 +160,6 @@ const Inventory = () => {
     <>
       <section className="w-full">
         {/* header */}
-
         <header className="flex w-full bg-[#6B728E] border-b-2 p-4">
           <div className="flex w-full">
             <h1 className="text-white font-semibold text-sm">Inventory</h1>
@@ -173,6 +172,7 @@ const Inventory = () => {
           <div className="flex justify-center w-full min-h-[634px] bg-[#474E68] p-10">
             <div className="w-full sm:-mx-6 lg:-mx-8 bg-[#ffffff] rounded-lg shadow-lg">
               {/* Subtitle */}
+              <div className="fixed top-5 right-5">{success && <Alert severity="success">{success}</Alert>}</div>
 
               <h2 className="font-bold mt-4 ml-8 text-xl text-center uppercase">Inventory</h2>
               <div className="flex justify-between items-center">

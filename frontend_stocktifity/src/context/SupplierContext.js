@@ -71,11 +71,17 @@ export const SupplierProvider = (props) => {
         const result = await axios.post("http://localhost:5000/api/v1/suppliers", { name, email, phone, address });
         setFetchStatus(true);
         setSuccess(result.data.message);
+        setTimeout(() => {
+          setSuccess(null);
+        }, 4000);
       } else {
         // Update Data
         const result = await axios.put(`http://localhost:5000/api/v1/suppliers/${currentId}`, { name, email, phone, address });
         setFetchStatus(true);
         setSuccess(result.data.message);
+        setTimeout(() => {
+          setSuccess(null);
+        }, 4000);
       }
 
       setInput({
@@ -92,6 +98,11 @@ export const SupplierProvider = (props) => {
         setErrorName(errorMessage.messageName);
         setErrorEmail(errorMessage.messageEmail);
         setErrorPhone(errorMessage.messagePhone);
+        setTimeout(() => {
+          setErrorName(null);
+          setErrorEmail(null);
+          setErrorPhone(null);
+        }, 2000);
       }
     }
   };
