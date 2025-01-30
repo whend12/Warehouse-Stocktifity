@@ -4,7 +4,7 @@ import { Link, useNavigate, redirect } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 
 import logo from "../assets/img/logo.png";
-import "./Login.css";
+import "../css/Login.css";
 
 // import from MUI
 import { Alert, Modal, Box, Typography } from "@mui/material";

@@ -5,7 +5,7 @@ import jwt_decode from "jwt-decode";
 import moment from "moment";
 
 // Import Footer
-import Footer from "../pages/Footer";
+import Footer from "../layouts/Footer";
 
 // Import Icon
 import { BsFillPersonFill } from "react-icons/bs";

@@ -1,19 +1,19 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-// Import Components
-import Login from "./components/Login";
-import Sidebar from "./pages/Sidebar";
-import Dashboard from "./components/Dashboard";
-import Inventory from "./components/Inventory";
-import Order from "./components/Order";
-import Supplier from "./components/Supplier";
+// Import Pages
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Inventory from "./pages/Inventory";
+import Order from "./pages/Order";
+import Supplier from "./pages/Supplier";
+import Sidebar from "./layouts/Sidebar";
 
 // Import useContext
 import { InventoryProvider } from "./context/InventoryContext";
 import { SupplierProvider } from "./context/SupplierContext";
 import { OrderProvider } from "./context/OrderContext";
-import Header from "./pages/Header";
+import Header from "./layouts/Header";
 
 const App = () => {
   return (

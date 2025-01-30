@@ -1,13 +1,11 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 import axios from "axios";
-import moment from "moment";
 
 // Import File
-import "./Inventory.css";
-import Footer from "../pages/Footer";
-import { InventoryContext } from "../context/InventoryContext";
+import Footer from "../layouts/Footer";
+import { SupplierContext } from "../context/SupplierContext";
 
 // Import Icon
 import { AiFillPlusSquare } from "react-icons/ai";
@@ -15,6 +13,13 @@ import { FiEdit } from "react-icons/fi";
 import { TiCancel } from "react-icons/ti";
 import { ImCancelCircle } from "react-icons/im";
 import SearchSharpIcon from "@mui/icons-material/SearchSharp";
+
+// Import Dialog
+// import Dialog from "@mui/material/Dialog";
+// import { Alert } from "@mui/material";
+// import AlertTitle from "@mui/material/AlertTitle";
+// import DialogActions from "@mui/material/DialogActions";
+// import Slide from "@mui/material/Slide";
 
 // Import from MUI
 import { Alert } from "@mui/material";
@@ -27,10 +32,13 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import { create } from "@mui/material/styles/createTransitions";
 
-const Inventory = () => {
-  const { state, handleFunction } = useContext(InventoryContext);
+// const Transition = React.forwardRef(function Transition(props, ref) {
+//   return <Slide direction="up" ref={ref} {...props} />;
+// });
+
+const Supplier = () => {
+  const { state, handleFunction } = useContext(SupplierContext);
 
   let {
     showModal,
@@ -45,30 +53,27 @@ const Inventory = () => {
     setOrderBy,
     page,
     setPage,
+    rowsPerPage,
+    setRowsPerPage,
     data,
     setData,
     fetchStatus,
     setFetchStatus,
-    currentSku,
-    setCurrentSku,
     input,
     setInput,
+    edit,
+    setEdit,
     success,
     setSuccess,
     errorName,
     setErrorName,
-    errorSku,
-    setErrorSku,
-    rowsPerPage,
-    setRowsPerPage,
-    suppliers,
-    setSuppliers,
-    edit,
-    setEdit,
+    errorEmail,
+    setErrorEmail,
+    errorPhone,
+    setErrorPhone,
   } = state;
 
-  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleCreate, handleEdit, handleDelete, handleChangePage, handleChangeRowsPerPage, handleRequestSort, getComparator, descendingComparator, stableSort, handleSupplierSelect } =
-    handleFunction;
+  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleCreate, handleEdit, handleDelete, handleRequestSort, getComparator, descendingComparator, stableSort, handleChangePage, handleChangeRowsPerPage } = handleFunction;
 
   const [name, setName] = useState("");
   const [token, setToken] = useState("");
@@ -121,17 +126,9 @@ const Inventory = () => {
   useEffect(() => {
     let fetchData = async () => {
       try {
-        let result = await axios.get("http://localhost:5000/api/v1/products");
+        let result = await axios.get("http://localhost:5000/api/v1/suppliers");
         setData(result.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    let fetchSuppliers = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/v1/suppliers");
-        setSuppliers(response.data);
+        console.log(result.data)
       } catch (error) {
         console.log(error);
       }
@@ -139,30 +136,29 @@ const Inventory = () => {
 
     if (fetchStatus) {
       fetchData();
-      fetchSuppliers();
       setFetchStatus(false);
     }
   }, [fetchStatus, setFetchStatus]);
 
   const columns = [
-    { id: "sku", label: "SKU" },
+    { id: "no", label: "No" },
     { id: "name", label: "Name" },
-    { id: "quantity", label: "Quantity" },
-    { id: "category", label: "Category" },
-    { id: "Supplier", label: "Supplier" },
-    { id: "date", label: "Date" },
+    { id: "email", label: "Email" },
+    { id: "phone", label: "Phone" },
+    { id: "address", label: "Address" },
     { id: "action", label: "Action" },
   ];
 
-  const filteredData = data.filter((row) => row.sku.toLowerCase().includes(search.toLowerCase()) || row.name.toLowerCase().includes(search.toLowerCase()) || row.Supplier?.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredData = data !== null ? data.filter((row) => (row.no && row.no.toLowerCase().includes(search.toLowerCase())) || (row.name && row.name.toLowerCase().includes(search.toLowerCase()))) : null;
 
   return (
     <>
       <section className="w-full">
         {/* header */}
+
         <header className="flex w-full bg-[#6B728E] border-b-2 p-4">
           <div className="flex w-full">
-            <h1 className="text-white font-semibold text-sm">Inventory</h1>
+            <h1 className="text-white font-semibold text-sm">Supplier</h1>
           </div>
         </header>
 
@@ -174,7 +170,7 @@ const Inventory = () => {
               {/* Subtitle */}
               <div className="fixed top-5 right-5">{success && <Alert severity="success">{success}</Alert>}</div>
 
-              <h2 className="font-bold mt-4 ml-8 text-xl text-center uppercase">Inventory</h2>
+              <h2 className="font-bold mt-4 ml-8 text-xl text-center uppercase">Supplier</h2>
               <div className="flex justify-between items-center">
                 <div className="search ml-8">
                   <label htmlFor="search" className="text-black">
@@ -199,7 +195,7 @@ const Inventory = () => {
                 </div>
               </div>
 
-              {/* Table Inventory */}
+              {/* Table Supplier */}
 
               <div className="py-2 sm:px-6 lg:px-8">
                 <div className="overflow-auto">
@@ -217,31 +213,26 @@ const Inventory = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {stableSort(filteredData, getComparator(order, orderBy))
-                          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                          .map((row) => (
-                            <TableRow key={row.id}>
-                              <TableCell>{row.sku}</TableCell>
-                              <TableCell>{row.name}</TableCell>
-                              <TableCell>{row.quantity}</TableCell>
-                              <TableCell>{row.category}</TableCell>
-                              <TableCell>{row.Supplier?.name}</TableCell>
-                              <TableCell>
-                                <span className="font-bold">Created : </span>
-                                {moment(row.createdAt).format("DD MMMM YYYY, LT")} <br></br>
-                                <span className="font-bold">Updated : </span>
-                                {moment(row.updatedAt).format("DD MMMM YYYY, LT")}
-                              </TableCell>
-                              <TableCell className="whitespace-nowrap">
-                                <button onClick={() => handleEdit(row._id)} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
-                                  <FiEdit size={21} color={"white"} className="mx-auto" />
-                                </button>
-                                <button onClick={() => handleDelete(row._id)} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
-                                  <TiCancel size={21} color={"white"} className="mx-auto" />
-                                </button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
+                        {filteredData &&
+                          stableSort(filteredData, getComparator(order, orderBy))
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row, index) => (
+                              <TableRow key={row.id}>
+                                <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+                                <TableCell>{row.name}</TableCell>
+                                <TableCell>{row.email}</TableCell>
+                                <TableCell>{row.phone}</TableCell>
+                                <TableCell>{row.address}</TableCell>
+                                <TableCell className="whitespace-nowrap">
+                                  <button onClick={() => handleEdit(row._id)} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
+                                    <FiEdit size={21} color={"white"} className="mx-auto" />
+                                  </button>
+                                  <button onClick={() => handleDelete(row._id)} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
+                                    <TiCancel size={21} color={"white"} className="mx-auto" />
+                                  </button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
                       </TableBody>
                     </Table>
                   </TableContainer>
@@ -249,9 +240,9 @@ const Inventory = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 15]}
                   component="div"
-                  count={data.length}
+                  count={data ? data.length : 0}
                   rowsPerPage={rowsPerPage}
-                  page={Math.max(0, Math.min(page, Math.ceil(data.length / rowsPerPage) - 1))}
+                  page={Math.max(0, Math.min(page, Math.ceil(data ? data.length : 0 / rowsPerPage) - 1))}
                   onPageChange={handleChangePage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
                 />
@@ -267,14 +258,15 @@ const Inventory = () => {
       {showModal ? (
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-            <div className="absolute top-5 right-5">{success && <Alert severity="success">{success}</Alert>}</div>
+          <div className="absolute top-5 right-5">{success && <Alert severity="success">{success}</Alert>}</div>
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
+
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {/*header*/}
 
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
-                  <h2 className="font-semibold text-center text-[#404258] uppercase">Inventory</h2>
+                  <h2 className="font-semibold text-center text-[#404258] uppercase">supplier</h2>
                   <button onClick={() => setShowModal(false)} className="w-1 shadow-none focus:outline-none">
                     <ImCancelCircle fill="#D61355" />
                   </button>
@@ -303,95 +295,76 @@ const Inventory = () => {
                       </div>
                     </div>
                     {errorName && (
-                      <Alert sx={{ padding: 0.4, width: 275, height: 44, background: "none" }} severity="error" className="ml-10">
+                      <Alert sx={{ padding: 0, width: 275, height: 56, background: "none" }} severity="error" className="ml-10">
                         {errorName}
                       </Alert>
                     )}
                     <div className="w-full sm:flex items-center">
                       <div className="w-full sm:w-1/3">
-                        <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Quantity</label>
+                        <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Email</label>
                       </div>
                       <div className="w-full sm:w-1/2 pl-4 pr-4">
                         <input
                           onChange={handleInput}
-                          value={input.quantity}
-                          max={100000}
-                          type="number"
-                          id="quantity"
-                          name="quantity"
-                          placeholder="0"
+                          value={input.email}
+                          type="email"
+                          id="email"
+                          name="email"
+                          placeholder="Example@example.com"
                           className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
                           required
                         ></input>
                       </div>
                     </div>
-                    <div className="w-full sm:flex items-center">
-                      <div className="w-full sm:w-1/3">
-                        <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Sku</label>
-                      </div>
-                      <div className="w-full sm:w-1/2 pl-4 pr-4">
-                        <input
-                          onChange={handleInput}
-                          value={input.sku}
-                          maxLength={8}
-                          type="text"
-                          id="sku"
-                          name="sku"
-                          placeholder="A001"
-                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
-                          required
-                        ></input>
-                      </div>
-                    </div>
-                    {errorSku && (
-                      <Alert sx={{ padding: 0.4, width: 275, height: 44, background: "none" }} severity="error" className="ml-10">
-                        {errorSku}
+                    {errorEmail && (
+                      <Alert sx={{ padding: 0, width: 275, height: 56, background: "none" }} severity="error" className="ml-10">
+                        {errorEmail}
                       </Alert>
                     )}
                     <div className="w-full sm:flex items-center">
                       <div className="w-full sm:w-1/3">
-                        <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Category</label>
+                        <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Phone</label>
                       </div>
                       <div className="w-full sm:w-1/2 pl-4 pr-4">
                         <input
                           onChange={handleInput}
-                          value={input.category}
-                          maxLength={20}
-                          type="text"
-                          id="category"
-                          name="category"
-                          placeholder="Input category"
+                          value={input.phone}
+                          maxLength={8}
+                          type="number"
+                          name="phone"
+                          id="phone"
+                          placeholder="628987654888"
                           className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
                           required
                         ></input>
                       </div>
                     </div>
+                    {errorPhone && (
+                      <Alert sx={{ padding: 0, width: 275, height: 56, background: "none" }} severity="error" className="ml-10">
+                        {errorPhone}
+                      </Alert>
+                    )}
                     <div className="w-full sm:flex items-center">
                       <div className="w-full sm:w-1/3">
-                        <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Supplier</label>
+                        <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Address</label>
                       </div>
                       <div className="w-full sm:w-1/2 pl-4 pr-4">
-                        <select
+                        <input
                           onChange={handleInput}
-                          value={input.Supplier?.name}
-                          id="Supplier"
-                          name="Supplier"
-                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none appearance-none"
-                          required={!edit}
-                          disabled={edit}
-                        >
-                          <option value="">-- Select Supplier --</option>
-                          {suppliers.map((Supplier) => (
-                            <option key={Supplier.id} value={Supplier.name}>
-                              {Supplier.name}
-                            </option>
-                          ))}
-                        </select>
+                          value={input.address}
+                          maxLength={50}
+                          type="text"
+                          name="address"
+                          id="address"
+                          placeholder="Input address"
+                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none capitalize"
+                          required
+                        ></input>
                       </div>
                     </div>
                     <div className="w-full sm:flex items-center pt-6 pb-6">
                       <div className="w-full flex justify-center items-center">
-                        <button type={"submit"} className="w-[130px] sm:mr-[-5rem] p-1 bg-[#3282B8] text-white shadow-lg rounded-xl hover:outline-none hover:bg-[#5584AC]">
+                        <button onClick={() => setShowModal(true)} type={"submit"} className="w-[130px] sm:mr-[-5rem] p-1 bg-[#3282B8] text-white shadow-lg rounded-xl hover:outline-none hover:bg-[#5584AC]">
                           Submit
                         </button>
                       </div>
@@ -406,8 +379,25 @@ const Inventory = () => {
           <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
         </>
       ) : null}
+
+      {/* Dialog Cancel */}
+
+      {/* <Dialog open={open} TransitionComponent={Transition} keepMounted onClose={handleClose} aria-describedby="alert-dialog-slide-description">
+        <Alert severity="warning">
+          <AlertTitle>Warning</AlertTitle>
+          <strong>Are you sure you want to delete?</strong>
+        </Alert>
+        <DialogActions>
+          <button onClick={handleClose} className="bg-[#EB455F] rounded hover:bg-[#C92C6D] focus:outline-none">
+            Yes
+          </button>
+          <button onClick={handleClose} className="bg-[#FFED00] rounded hover:bg-[#F9F54B] focus:outline-none">
+            No
+          </button>
+        </DialogActions>
+      </Dialog> */}
     </>
   );
 };
 
-export default Inventory;
+export default Supplier;

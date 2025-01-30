@@ -5,13 +5,13 @@ import axios from "axios";
 import moment from "moment";
 
 // Import File
-import "./Order.css";
-import Footer from "../pages/Footer";
-import { OrderContext } from "../context/OrderContext";
+import "../css/Inventory.css";
+import Footer from "../layouts/Footer";
+import { InventoryContext } from "../context/InventoryContext";
 
 // Import Icon
 import { AiFillPlusSquare } from "react-icons/ai";
-import { GiConfirmed } from "react-icons/gi";
+import { FiEdit } from "react-icons/fi";
 import { TiCancel } from "react-icons/ti";
 import { ImCancelCircle } from "react-icons/im";
 import SearchSharpIcon from "@mui/icons-material/SearchSharp";
@@ -27,9 +27,10 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
+import { create } from "@mui/material/styles/createTransitions";
 
-const Order = () => {
-  const { state, handleFunction } = useContext(OrderContext);
+const Inventory = () => {
+  const { state, handleFunction } = useContext(InventoryContext);
 
   let {
     showModal,
@@ -44,18 +45,14 @@ const Order = () => {
     setOrderBy,
     page,
     setPage,
-    dataPending,
-    setDataPending,
-    dataProducts,
-    setDataProducts,
+    data,
+    setData,
     fetchStatus,
     setFetchStatus,
     currentSku,
     setCurrentSku,
     input,
     setInput,
-    error,
-    setError,
     success,
     setSuccess,
     errorName,
@@ -66,24 +63,12 @@ const Order = () => {
     setRowsPerPage,
     suppliers,
     setSuppliers,
+    edit,
+    setEdit,
   } = state;
 
-  let {
-    handleClickOpen,
-    handleClose,
-    handleInput,
-    handleSelect,
-    handleSubmit,
-    handleConfirm,
-    handleDelete,
-    handleChangePage,
-    handleChangeRowsPerPage,
-    handleRequestSort,
-    getComparator,
-    descendingComparator,
-    stableSort,
-    handleSupplierSelect,
-  } = handleFunction;
+  let { handleClickOpen, handleClose, handleInput, handleSubmit, handleCreate, handleEdit, handleDelete, handleChangePage, handleChangeRowsPerPage, handleRequestSort, getComparator, descendingComparator, stableSort, handleSupplierSelect } =
+    handleFunction;
 
   const [name, setName] = useState("");
   const [token, setToken] = useState("");
@@ -134,48 +119,26 @@ const Order = () => {
   );
 
   useEffect(() => {
-    let fetchDataPending = async () => {
-      try {
-        let result = await axios.get("http://localhost:5000/api/v1/pending");
-        setDataPending(result.data.pendingProducts);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    if (fetchStatus) {
-      fetchDataPending();
-      setFetchStatus(false);
-    }
-  }, [fetchStatus, setFetchStatus]);
-
-  useEffect(() => {
-    let fetchDataProducts = async () => {
+    let fetchData = async () => {
       try {
         let result = await axios.get("http://localhost:5000/api/v1/products");
-        setDataProducts(result.data);
+        setData(result.data);
       } catch (error) {
         console.log(error);
       }
     };
 
-    if (fetchStatus) {
-      fetchDataProducts();
-      setFetchStatus(false);
-    }
-  }, [fetchStatus, setFetchStatus]);
-
-  useEffect(() => {
     let fetchSuppliers = async () => {
       try {
-        const { data } = await axios.get("http://localhost:5000/api/v1/suppliers");
-        setSuppliers(data);
+        const response = await axios.get("http://localhost:5000/api/v1/suppliers");
+        setSuppliers(response.data);
       } catch (error) {
         console.log(error);
       }
     };
 
     if (fetchStatus) {
+      fetchData();
       fetchSuppliers();
       setFetchStatus(false);
     }
@@ -188,23 +151,18 @@ const Order = () => {
     { id: "category", label: "Category" },
     { id: "Supplier", label: "Supplier" },
     { id: "date", label: "Date" },
-    { id: "confirmed", label: "Status" },
     { id: "action", label: "Action" },
   ];
 
-  const filteredData =
-    dataPending && Array.isArray(dataPending)
-      ? dataPending.filter((row) => row.sku.toLowerCase().includes(search.toLowerCase()) || row.name.toLowerCase().includes(search.toLowerCase()) || row.Supplier?.name.toLowerCase().includes(search.toLowerCase()))
-      : [];
+  const filteredData = data.filter((row) => row.sku.toLowerCase().includes(search.toLowerCase()) || row.name.toLowerCase().includes(search.toLowerCase()) || row.Supplier?.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <>
       <section className="w-full">
         {/* header */}
-
         <header className="flex w-full bg-[#6B728E] border-b-2 p-4">
           <div className="flex w-full">
-            <h1 className="text-white font-semibold text-sm">Order</h1>
+            <h1 className="text-white font-semibold text-sm">Inventory</h1>
           </div>
         </header>
 
@@ -214,9 +172,9 @@ const Order = () => {
           <div className="flex justify-center w-full min-h-[634px] bg-[#474E68] p-10">
             <div className="w-full sm:-mx-6 lg:-mx-8 bg-[#ffffff] rounded-lg shadow-lg">
               {/* Subtitle */}
-              <div className="fixed top-5 right-5">{success ? <Alert severity="success">{success}</Alert> : error && <Alert severity="error">{error}</Alert>}</div>
+              <div className="fixed top-5 right-5">{success && <Alert severity="success">{success}</Alert>}</div>
 
-              <h2 className="font-bold mt-4 ml-8 text-xl text-center uppercase">Order</h2>
+              <h2 className="font-bold mt-4 ml-8 text-xl text-center uppercase">Inventory</h2>
               <div className="flex justify-between items-center">
                 <div className="search ml-8">
                   <label htmlFor="search" className="text-black">
@@ -234,14 +192,14 @@ const Order = () => {
                   {/* <span className="px-2"><SearchSharpIcon/></span> */}
                 </div>
                 <div className="btn-create">
-                  <button onClick={() => setShowModal(true)} className="flex items-center w-[6rem] bg-[#03C988] text-white mr-8 p-1 rounded shadow-xl hover:bg-[#03C4A1] focus:outline-none">
+                  <button onClick={handleCreate} className="flex items-center w-[6rem] bg-[#03C988] text-white mr-8 p-1 rounded shadow-xl hover:bg-[#03C4A1] focus:outline-none">
                     <AiFillPlusSquare size={21} color={"white"} className="mr-2" />
                     Create
                   </button>
                 </div>
               </div>
 
-              {/* Table Order */}
+              {/* Table Inventory */}
 
               <div className="py-2 sm:px-6 lg:px-8">
                 <div className="overflow-auto">
@@ -262,7 +220,7 @@ const Order = () => {
                         {stableSort(filteredData, getComparator(order, orderBy))
                           .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                           .map((row) => (
-                            <TableRow key={row._id}>
+                            <TableRow key={row.id}>
                               <TableCell>{row.sku}</TableCell>
                               <TableCell>{row.name}</TableCell>
                               <TableCell>{row.quantity}</TableCell>
@@ -274,10 +232,9 @@ const Order = () => {
                                 <span className="font-bold">Updated : </span>
                                 {moment(row.updatedAt).format("DD MMMM YYYY, LT")}
                               </TableCell>
-                              <TableCell>{row.confirmed ? "confirmed" : "pending"}</TableCell>
                               <TableCell className="whitespace-nowrap">
-                                <button onClick={() => handleConfirm(row._id)} className="w-10 bg-[#43ABAC] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
-                                  <GiConfirmed size={21} color={"white"} className="mx-auto" />
+                                <button onClick={() => handleEdit(row._id)} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">
+                                  <FiEdit size={21} color={"white"} className="mx-auto" />
                                 </button>
                                 <button onClick={() => handleDelete(row._id)} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">
                                   <TiCancel size={21} color={"white"} className="mx-auto" />
@@ -292,9 +249,9 @@ const Order = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 15]}
                   component="div"
-                  count={dataPending.length}
+                  count={data.length}
                   rowsPerPage={rowsPerPage}
-                  page={Math.max(0, Math.min(page, Math.ceil(dataPending.length / rowsPerPage) - 1))}
+                  page={Math.max(0, Math.min(page, Math.ceil(data.length / rowsPerPage) - 1))}
                   onPageChange={handleChangePage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
                 />
@@ -317,7 +274,7 @@ const Order = () => {
                 {/*header*/}
 
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
-                  <h2 className="font-semibold text-center text-[#404258] uppercase">Order</h2>
+                  <h2 className="font-semibold text-center text-[#404258] uppercase">Inventory</h2>
                   <button onClick={() => setShowModal(false)} className="w-1 shadow-none focus:outline-none">
                     <ImCancelCircle fill="#D61355" />
                   </button>
@@ -327,28 +284,6 @@ const Order = () => {
 
                 <div className="relative flex-auto">
                   <form onSubmit={handleSubmit} className="bg-white rounded-md w-50">
-                    <div className="w-full sm:flex items-center">
-                      <div className="w-full sm:w-1/3">
-                        <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Sku</label>
-                      </div>
-                      <div className="w-full sm:w-1/2 pl-4 pr-4">
-                        <select
-                          onChange={handleSelect}
-                          value={input.sku}
-                          id="sku"
-                          name="sku"
-                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
-                          required
-                        >
-                          <option value="">-- Select sku --</option>
-                          {dataProducts.sort((a, b) => a.sku.localeCompare(b.sku)).map((product) => (
-                            <option key={product._id} value={product.sku}>
-                              {product.sku}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
                     <div className="w-full sm:flex items-center">
                       <div className="w-full sm:w-1/3">
                         <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Name</label>
@@ -362,8 +297,8 @@ const Order = () => {
                           id="name"
                           name="name"
                           placeholder="Input name"
-                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
-                          disabled
+                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none capitalize"
+                          required
                         ></input>
                       </div>
                     </div>
@@ -380,7 +315,6 @@ const Order = () => {
                         <input
                           onChange={handleInput}
                           value={input.quantity}
-                          min={1}
                           max={100000}
                           type="number"
                           id="quantity"
@@ -391,6 +325,29 @@ const Order = () => {
                         ></input>
                       </div>
                     </div>
+                    <div className="w-full sm:flex items-center">
+                      <div className="w-full sm:w-1/3">
+                        <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Sku</label>
+                      </div>
+                      <div className="w-full sm:w-1/2 pl-4 pr-4">
+                        <input
+                          onChange={handleInput}
+                          value={input.sku}
+                          maxLength={8}
+                          type="text"
+                          id="sku"
+                          name="sku"
+                          placeholder="A001"
+                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
+                          required
+                        ></input>
+                      </div>
+                    </div>
+                    {errorSku && (
+                      <Alert sx={{ padding: 0.4, width: 275, height: 44, background: "none" }} severity="error" className="ml-10">
+                        {errorSku}
+                      </Alert>
+                    )}
                     <div className="w-full sm:flex items-center">
                       <div className="w-full sm:w-1/3">
                         <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Category</label>
@@ -405,7 +362,7 @@ const Order = () => {
                           name="category"
                           placeholder="Input category"
                           className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
-                          disabled
+                          required
                         ></input>
                       </div>
                     </div>
@@ -414,17 +371,22 @@ const Order = () => {
                         <label className="block font-bold text-[#404258] md:text-left pl-5 sm:pl-5 md:pl-10 pr-14">Supplier</label>
                       </div>
                       <div className="w-full sm:w-1/2 pl-4 pr-4">
-                        <input
+                        <select
                           onChange={handleInput}
                           value={input.Supplier?.name}
-                          maxLength={20}
-                          type="text"
-                          id="supplier"
-                          name="supplier"
-                          placeholder="Input supplier"
-                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none"
-                          disabled
-                        ></input>
+                          id="Supplier"
+                          name="Supplier"
+                          className="block w-full border-b-2 border-[#6B728E] text-sm pl-2 rounded-md shadow-none focus:bg-[#E4E4E4] focus:border-[#404258] focus:text-black outline-none appearance-none"
+                          required={!edit}
+                          disabled={edit}
+                        >
+                          <option value="">-- Select Supplier --</option>
+                          {suppliers.map((Supplier) => (
+                            <option key={Supplier.id} value={Supplier.name}>
+                              {Supplier.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                     <div className="w-full sm:flex items-center pt-6 pb-6">
@@ -448,4 +410,4 @@ const Order = () => {
   );
 };
 
-export default Order;
+export default Inventory;
