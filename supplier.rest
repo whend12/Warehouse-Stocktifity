@@ -1,0 +1,34 @@
+GET http://localhost:5000/api/v1/suppliers/
+###
+
+
+GET http://localhost:5000/api/v1/suppliers/640051c6be77cd17827d00d1
+
+
+
+###
+POST http://localhost:5000/api/v1/suppliers
+Content-Type: application/json
+
+{
+    "name": " beton",
+    "email": "wend21@gmail.com",
+    "phone": "08892121231223",
+    "address": "Bantar Listrik Gerbang 54"
+}
+
+####
+//update supplier
+PUT http://localhost:5000/api/v1/suppliers/64007f5f014aea70c9dab88a
+Content-Type: application/json
+
+{
+    "name": "wendy beton",
+    "email": "wend1@gmail.com",
+    "phone": "08892123123",
+    "address": "Bantar Listrik Gerbang 10"
+}
+
+###
+//delete supplier
+DELETE http://localhost:5000/api/v1/suppliers/6401b3698b3eb046a71a28ba

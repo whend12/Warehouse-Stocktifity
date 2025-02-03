@@ -1,0 +1,36 @@
+GET http://localhost:5000/api/v1/products/
+
+
+
+###
+POST  http://localhost:5000/api/v1/products
+Content-Type: application/json
+
+{
+    "name": "penghapus 43B",
+    "quantity": 100,
+    "sku": "A0013",
+    "category": "Alat Tulis",
+    "Supplier": "6411bca2212fe22a1161502e"
+}
+
+###
+GET http://localhost:5000/api/v1/products/63f3ce1e1ba476d6536a75f0
+
+
+###
+
+PUT http://localhost:5000/api/v1/products/6401b20250933f2e5942c748
+Content-Type: application/json
+
+{   "name": "penghapus 43B",
+    "quantity": 100,
+    "sku": "A0020",
+    "category": "Alat Tulis"
+}
+
+###
+DELETE http://localhost:5000/api/v1/products/64004fc9be77cd17827d00b7
+
+###
+GET http://localhost:5000/api/v1/products/search/pen
